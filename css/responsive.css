@@ -1,0 +1,297 @@
+@media (max-width: 1180px) {
+  .topbar {
+    grid-template-columns: 1fr;
+  }
+
+  .stats {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .editor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-side {
+    position: static;
+  }
+}
+
+@media (max-width: 900px) {
+  body {
+    padding: 14px;
+  }
+
+  .title-container {
+    align-items: flex-start;
+    padding: 16px;
+  }
+
+  .brand-block {
+    gap: 12px;
+  }
+
+  .brand-block img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .title {
+    font-size: 28px;
+  }
+
+  .subtitle {
+    display: none;
+  }
+
+  .top-nav-menu {
+    right: 0;
+    width: min(320px, calc(100vw - 28px));
+  }
+
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-search,
+  .toolbar-mini {
+    max-width: none;
+    width: 100%;
+    flex: 1 1 auto;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .stat-card {
+    min-width: 0;
+    padding: 13px 12px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .view-table .item {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  body {
+    padding: 10px;
+    background-attachment: scroll;
+  }
+
+  .title-container {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .brand-block img {
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+  }
+
+  .title {
+    font-size: 22px;
+    letter-spacing: 0.03em;
+  }
+
+  .menu-toggle-btn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+  }
+
+  .topbar {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .controls,
+  .filters-bar,
+  .list-header {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .filters-bar {
+    gap: 8px;
+  }
+
+  .filter-chip {
+    flex: 1 1 auto;
+    justify-content: center;
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .stat-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .stat-label {
+    margin: 0;
+  }
+
+  .section-label {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .view-badge {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .notes-list.view-cards {
+    grid-template-columns: 1fr;
+    justify-items: stretch;
+  }
+
+  .item {
+    max-width: none;
+  }
+
+  .view-compact .item {
+    grid-template-columns: 1fr;
+  }
+
+  .modal {
+    padding: 10px;
+    align-items: stretch;
+  }
+
+  .modal-card {
+    width: 100%;
+    max-height: calc(100vh - 20px);
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .modal-title {
+    margin-right: 44px;
+  }
+
+  .editor-header,
+  .image-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .editor-header-actions,
+  .file-actions {
+    width: 100%;
+  }
+
+  .editor-header-actions .btn,
+  .file-actions .btn {
+    flex: 1 1 auto;
+  }
+
+  .editor-actions,
+  .confirm-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .editor-actions .btn,
+  .confirm-actions .btn {
+    width: 100%;
+  }
+
+  .background-picker-panel {
+    width: calc(100vw - 36px);
+    grid-template-columns: 1fr;
+  }
+
+  .toast-region {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    width: auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .brand-text {
+    max-width: 170px;
+  }
+
+  .title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .btn {
+    white-space: normal;
+  }
+
+  .note-actions {
+    left: 12px;
+    right: 12px;
+    justify-content: flex-end;
+  }
+
+  .note-meta {
+    right: 96px;
+  }
+
+  .editor-row {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .color-picker {
+    justify-content: space-between;
+  }
+}
+
+@media print {
+  body {
+    background: #ffffff;
+    color: #000000;
+    padding: 0;
+  }
+
+  .title-container,
+  .topbar,
+  .list-header,
+  .load-more-wrapper,
+  .modal,
+  .toast-region {
+    display: none !important;
+  }
+
+  .notes-list,
+  .notes-list.view-cards,
+  .notes-list.view-list,
+  .notes-list.view-compact,
+  .notes-list.view-table {
+    display: block;
+  }
+
+  .item {
+    break-inside: avoid;
+    max-width: none;
+    height: auto;
+    max-height: none;
+    min-height: unset;
+    box-shadow: none;
+    border: 1px solid #cccccc;
+    margin: 0 0 12px;
+    transform: none !important;
+  }
+}
