@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Notes Me V11</title>
+
+  <meta
+    http-equiv="Content-Security-Policy"
+    content="
+      default-src 'self';
+      script-src 'self';
+      style-src 'self' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com;
+      img-src 'self' blob: data:;
+      media-src 'self' blob:;
+      object-src 'none';
+      frame-src 'self' blob:;
+      connect-src 'self';
+      manifest-src 'self';
+      worker-src 'self';
+      base-uri 'self';
+      form-action 'self';
+    "
+  >
+
+  <meta name="description" content="Notes Me, application locale de gestion de notes avec pièces jointes, favoris, corbeille, recherche avancée, export ZIP et mode hors ligne.">
+  <meta name="theme-color" content="#07111f">
+  <meta name="color-scheme" content="dark light">
+  <meta name="application-name" content="Notes Me">
+  <meta name="apple-mobile-web-app-title" content="Notes Me">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <link rel="icon" type="image/png" href="./assets/logo.png">
+  <link rel="apple-touch-icon" href="./assets/logo.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/notes.css">
+  <link rel="stylesheet" href="./css/modals.css">
+  <link rel="stylesheet" href="./css/responsive.css">
+</head>
+
+<body>
+  <a class="skip-link" href="#mainContent">Aller au contenu principal</a>
+
+  <div id="app" class="app-shell">
+    <header class="title-container" role="banner">
+      <div class="brand-block">
+        <img src="./assets/logo.png" alt="Logo Notes Me" width="56" height="56">
+        <div class="brand-text">
+          <h1 class="title">Notes Me</h1>
+          <p class="subtitle">Dashboard local de notes</p>
+        </div>
+      </div>
+
+      <nav class="top-nav" aria-label="Menu principal">
+        <button
+          id="menuToggleBtn"
+          class="btn btn-secondary menu-toggle-btn"
+          type="button"
+          aria-label="Ouvrir le menu"
+          aria-expanded="false"
+          aria-controls="topNavMenu"
+        >
+          ☰
+        </button>
+
+        <div id="topNavMenu" class="top-nav-menu" aria-hidden="true">
+          <button id="openBtn" class="nav-menu-btn btn btn-primary" type="button">
+            ➕ Nouvelle note
+          </button>
+
+          <button id="exportZipBtn" class="nav-menu-btn btn btn-secondary" type="button">
+            📦 Export ZIP
+          </button>
+
+          <button id="importZipBtn" class="nav-menu-btn btn btn-secondary" type="button">
+            📥 Import ZIP
+          </button>
+
+          <input id="importZipInput" type="file" accept=".zip,application/zip" hidden>
+
+          <button id="installAppBtn" class="nav-menu-btn btn btn-secondary" type="button" hidden>
+            📲 Installer l’application
+          </button>
+
+          <button id="toggleTrashViewBtn" class="nav-menu-btn btn btn-secondary" type="button">
+            🗑️ Voir la corbeille
+          </button>
+
+          <button id="emptyTrashBtn" class="nav-menu-btn btn btn-danger" type="button">
+            🧹 Vider la corbeille
+          </button>
+
+          <button id="settingsBtn" class="nav-menu-btn btn btn-secondary" type="button">
+            ⚙️ Paramètres
+          </button>
+
+          <button id="themeToggleBtn" class="nav-menu-btn btn btn-secondary" type="button">
+            🌙 Thème sombre
+          </button>
+
+          <button id="helpBtn" class="nav-menu-btn btn btn-secondary" type="button">
+            ❔ Aide
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main id="mainContent" class="main-content" role="main" tabindex="-1">
+      <section class="topbar" aria-label="Contrôles et filtres">
+        <div class="controls">
+          <div class="toolbar-search">
+            <label class="sr-only" for="searchInput">Rechercher une note</label>
+            <input
+              id="searchInput"
+              type="search"
+              placeholder='Rechercher, exemple : client #urgent category:compta has:pdf'
+              autocomplete="off"
+              spellcheck="true"
+            >
+          </div>
+
+          <label class="sr-only" for="categoryFilter">Filtrer par catégorie</label>
+          <select id="categoryFilter" class="toolbar-select toolbar-mini" aria-label="Filtrer par catégorie">
+            <option value="">Toutes catégories</option>
+          </select>
+
+          <label class="sr-only" for="sortSelect">Trier les notes</label>
+          <select id="sortSelect" class="toolbar-select toolbar-mini" aria-label="Trier les notes">
+            <option value="recent">Plus récentes</option>
+            <option value="updated">Dernière modification</option>
+            <option value="oldest">Plus anciennes</option>
+            <option value="title">Titre A à Z</option>
+            <option value="category">Catégorie</option>
+            <option value="custom">Ordre personnalisé</option>
+          </select>
+
+          <label class="sr-only" for="viewModeSelect">Mode d’affichage</label>
+          <select id="viewModeSelect" class="toolbar-select toolbar-mini" aria-label="Mode d’affichage">
+            <option value="cards">Vue cartes</option>
+            <option value="list">Vue liste</option>
+            <option value="compact">Vue compacte</option>
+            <option value="table">Vue tableau</option>
+          </select>
+        </div>
+
+        <div class="filters-bar" role="group" aria-label="Filtres rapides">
+          <button id="filterAllBtn" class="filter-chip active" type="button" aria-pressed="true">
+            Toutes
+          </button>
+
+          <button id="filterFavBtn" class="filter-chip" type="button" aria-pressed="false">
+            ⭐ Favoris
+          </button>
+
+          <button id="filterWithFileBtn" class="filter-chip" type="button" aria-pressed="false">
+            📎 Avec fichier
+          </button>
+
+          <button id="filterRecentBtn" class="filter-chip" type="button" aria-pressed="false">
+            🕒 Récentes
+          </button>
+        </div>
+
+        <aside class="stats" aria-label="Statistiques des notes">
+          <div class="stat-card">
+            <span class="stat-label">Actives</span>
+            <strong id="activeCount" class="stat-value">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-label">Favoris</span>
+            <strong id="favoriteCount" class="stat-value">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-label">Corbeille</span>
+            <strong id="trashCount" class="stat-value">0</strong>
+          </div>
+        </aside>
+      </section>
+
+      <section class="list-header" aria-label="Liste des notes">
+        <h2 id="listTitle" class="section-label">Mes notes</h2>
+        <span id="viewBadge" class="view-badge">Vue active</span>
+      </section>
+
+      <section
+        id="list"
+        class="notes-list view-cards"
+        aria-live="polite"
+        aria-busy="false"
+        aria-label="Notes"
+      ></section>
+
+      <div class="load-more-wrapper">
+        <button id="loadMoreBtn" class="btn btn-secondary" type="button" hidden>
+          Afficher plus de notes
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+  <div
+    id="noteModal"
+    class="modal modal-view"
+    role="dialog"
+    aria-modal="true"
+    aria-hidden="true"
+    aria-labelledby="noteModalTitle"
+  >
+    <div class="modal-card">
+      <button id="closeNoteModalBtn" class="modal-close" type="button" aria-label="Fermer la note">
+        ✖
+      </button>
+
+      <div id="noteModalContent" class="note-modal-content">
+        <h2 id="noteModalTitle" class="modal-title">Note</h2>
+      </div>
+    </div>
+  </div>
+
+  <div
+    id="editorModal"
+    class="modal editor-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-hidden="true"
+    aria-labelledby="editorModalTitle"
+  >
+    <div class="modal-card editor-card">
+      <button id="closeEditorModalBtn" class="modal-close" type="button" aria-label="Fermer l’éditeur">
+        ✖
+      </button>
+
+      <div class="editor-header">
+        <h2 id="editorModalTitle" class="modal-title">Nouvelle note</h2>
+
+        <div class="editor-header-actions">
+          <button id="emojiToggleBtn" class="btn btn-secondary" type="button" aria-expanded="false" aria-controls="emojiPanel">
+            😊 Emoji
+          </button>
+
+          <button id="attachBtn" class="btn btn-secondary" type="button">
+            📎 Joindre
+          </button>
+
+          <input
+            id="fileInput"
+            type="file"
+            accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/png,image/jpeg"
+            hidden
+          >
+        </div>
+      </div>
+
+      <div id="emojiPanel" class="emoji-panel hidden" aria-label="Sélecteur d’emojis">
+        <div class="emoji-tabs" role="tablist" aria-label="Catégories d’emojis">
+          <button class="emoji-tab active" type="button" data-group="recent" role="tab" aria-selected="true">Récents</button>
+          <button class="emoji-tab" type="button" data-group="smileys" role="tab" aria-selected="false">Smileys</button>
+          <button class="emoji-tab" type="button" data-group="symbols" role="tab" aria-selected="false">Symboles</button>
+        </div>
+
+        <div class="emoji-group" data-emoji-group="recent">
+          <button class="emoji-btn" type="button" data-emoji="⭐">⭐</button>
+          <button class="emoji-btn" type="button" data-emoji="✅">✅</button>
+          <button class="emoji-btn" type="button" data-emoji="📌">📌</button>
+          <button class="emoji-btn" type="button" data-emoji="📎">📎</button>
+          <button class="emoji-btn" type="button" data-emoji="⚠️">⚠️</button>
+        </div>
+
+        <div class="emoji-group hidden" data-emoji-group="smileys">
+          <button class="emoji-btn" type="button" data-emoji="😀">😀</button>
+          <button class="emoji-btn" type="button" data-emoji="🙂">🙂</button>
+          <button class="emoji-btn" type="button" data-emoji="😍">😍</button>
+          <button class="emoji-btn" type="button" data-emoji="🤔">🤔</button>
+          <button class="emoji-btn" type="button" data-emoji="🙏">🙏</button>
+        </div>
+
+        <div class="emoji-group hidden" data-emoji-group="symbols">
+          <button class="emoji-btn" type="button" data-emoji="€">€</button>
+          <button class="emoji-btn" type="button" data-emoji="→">→</button>
+          <button class="emoji-btn" type="button" data-emoji="✓">✓</button>
+          <button class="emoji-btn" type="button" data-emoji="✕">✕</button>
+          <button class="emoji-btn" type="button" data-emoji="•">•</button>
+        </div>
+      </div>
+
+      <div class="editor-grid">
+        <div class="editor-main">
+          <label class="editor-label" for="titleInput">Titre</label>
+          <input id="titleInput" type="text" placeholder="Titre de la note" maxlength="160">
+
+          <label class="editor-label" for="categoryInput">Catégorie</label>
+          <input id="categoryInput" type="text" list="categorySuggestions" placeholder="Exemple : Client, Compta, Perso">
+          <datalist id="categorySuggestions"></datalist>
+
+          <label class="editor-label" for="tagsInput">Tags</label>
+          <input id="tagsInput" type="text" placeholder="urgent, client, facture">
+
+          <div class="editor-row">
+            <div class="field-group">
+              <label class="editor-label" for="colorPaletteInput">Couleur</label>
+              <input id="colorPaletteInput" type="color" value="#fff8a6">
+              <input id="colorInput" type="hidden" value="#fff8a6">
+            </div>
+
+            <div class="field-group">
+              <span class="editor-label">Couleur active</span>
+              <div class="active-color-display">
+                <span id="activeColorPreview" class="active-color-preview"></span>
+                <span id="activeColorCode">#fff8a6</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="colorPicker" class="color-picker" aria-label="Palette de couleurs">
+            <button class="color-option" type="button" data-color="#fff8a6" aria-label="Jaune"></button>
+            <button class="color-option" type="button" data-color="#b9ffc0" aria-label="Vert"></button>
+            <button class="color-option" type="button" data-color="#c6e9ff" aria-label="Bleu"></button>
+            <button class="color-option" type="button" data-color="#ffd8e3" aria-label="Rose"></button>
+            <button class="color-option" type="button" data-color="#ffd5a3" aria-label="Orange"></button>
+            <button class="color-option" type="button" data-color="#e7d8ff" aria-label="Lilas"></button>
+          </div>
+
+          <div class="background-picker">
+            <button id="backgroundToggleBtn" class="btn btn-secondary" type="button" aria-expanded="false" aria-controls="backgroundPickerPanel">
+              🖼️ Fond de note
+            </button>
+
+            <span id="activeBackgroundName" class="active-background-name">Aucun fond</span>
+            <input id="backgroundImageInput" type="hidden" value="">
+
+            <div id="backgroundPickerPanel" class="background-picker-panel hidden" aria-label="Choisir un fond de note"></div>
+          </div>
+
+          <button
+            id="favoriteToggleBtn"
+            class="btn btn-secondary favorite-toggle-btn"
+            type="button"
+            aria-pressed="false"
+          >
+            ☆ Ajouter aux favoris
+          </button>
+          <input id="favoriteInput" type="hidden" value="false">
+
+          <label class="editor-label" for="contentInput">Contenu</label>
+          <textarea id="contentInput" placeholder="Notez ici..." rows="8"></textarea>
+
+          <div id="attachmentInfo" class="attachment-info" aria-live="polite" hidden>
+            <span aria-hidden="true">📎</span>
+            <span id="attachmentName" class="attachment-name"></span>
+            <button id="removeFileBtn" class="btn btn-secondary" type="button">
+              Retirer
+            </button>
+          </div>
+        </div>
+
+        <aside class="editor-side" aria-label="Aperçu de la note">
+          <p class="preview-title">Aperçu</p>
+          <div id="notePreview" aria-hidden="true"></div>
+        </aside>
+      </div>
+
+      <div class="editor-actions">
+        <button id="cancelEditBtn" class="btn btn-secondary" type="button">
+          Annuler
+        </button>
+
+        <button id="saveNoteBtn" class="btn btn-primary" type="button">
+          💾 Enregistrer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div
+    id="imageModal"
+    class="modal image-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-hidden="true"
+    aria-labelledby="imageModalTitle"
+  >
+    <div class="modal-card">
+      <button id="closeImageModalBtn" class="modal-close" type="button" aria-label="Fermer l’image">
+        ✖
+      </button>
+
+      <div class="image-toolbar">
+        <h2 id="imageModalTitle" class="modal-title">Aperçu image</h2>
+
+        <div class="file-actions">
+          <button id="downloadImageBtn" class="btn btn-secondary" type="button">
+            Télécharger
+          </button>
+        </div>
+      </div>
+
+      <div class="image-stage">
+        <img id="imageViewer" alt="Aperçu image plein écran">
+      </div>
+    </div>
+  </div>
+
+  <div
+    id="settingsModal"
+    class="modal settings-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-hidden="true"
+    aria-labelledby="settingsModalTitle"
+  >
+    <div class="modal-card">
+      <button id="closeSettingsModalBtn" class="modal-close" type="button" aria-label="Fermer les paramètres">
+        ✖
+      </button>
+
+      <h2 id="settingsModalTitle" class="modal-title">Paramètres</h2>
+
+      <div class="settings-grid">
+        <label class="editor-label" for="defaultViewModeSelect">Vue par défaut</label>
+        <select id="defaultViewModeSelect" class="toolbar-select">
+          <option value="cards">Vue cartes</option>
+          <option value="list">Vue liste</option>
+          <option value="compact">Vue compacte</option>
+          <option value="table">Vue tableau</option>
+        </select>
+
+        <label class="editor-label" for="pageSizeInput">Nombre de notes chargées</label>
+        <input id="pageSizeInput" type="number" min="20" max="300" step="10" value="80">
+
+        <label class="settings-check">
+          <input id="confirmBeforeDeleteInput" type="checkbox" checked>
+          <span>Confirmer avant suppression</span>
+        </label>
+
+        <label class="settings-check">
+          <input id="compactAnimationsInput" type="checkbox">
+          <span>Réduire les animations</span>
+        </label>
+      </div>
+
+      <div class="editor-actions">
+        <button id="resetSettingsBtn" class="btn btn-secondary" type="button">
+          Réinitialiser
+        </button>
+
+        <button id="saveSettingsBtn" class="btn btn-primary" type="button">
+          Enregistrer les paramètres
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div
+    id="helpModal"
+    class="modal modal-view"
+    role="dialog"
+    aria-modal="true"
+    aria-hidden="true"
+    aria-labelledby="helpModalTitle"
+  >
+    <div class="modal-card">
+      <button id="closeHelpModalBtn" class="modal-close" type="button" aria-label="Fermer l’aide">
+        ✖
+      </button>
+
+      <h2 id="helpModalTitle" class="modal-title">Aide</h2>
+
+      <div class="help-content">
+        <p>
+          Notes Me permet de créer des notes locales avec catégories, tags, favoris, pièces jointes et corbeille.
+        </p>
+
+        <h3>Recherche avancée</h3>
+        <p>Exemples utilisables dans la barre de recherche :</p>
+
+        <ul>
+          <li><code>#urgent</code> pour filtrer par tag.</li>
+          <li><code>category:client</code> pour filtrer par catégorie.</li>
+          <li><code>fav:true</code> pour afficher les favoris.</li>
+          <li><code>has:file</code> pour afficher les notes avec pièce jointe.</li>
+          <li><code>has:pdf</code> pour afficher les notes avec PDF.</li>
+          <li><code>"facture impayée"</code> pour rechercher une expression exacte.</li>
+        </ul>
+
+        <h3>Raccourcis</h3>
+        <ul>
+          <li><kbd>N</kbd> : nouvelle note.</li>
+          <li><kbd>Ctrl</kbd> + <kbd>S</kbd> : enregistrer depuis l’éditeur.</li>
+          <li><kbd>Échap</kbd> : fermer la fenêtre active.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div
+    id="confirmModal"
+    class="modal modal-view"
+    role="dialog"
+    aria-modal="true"
+    aria-hidden="true"
+    aria-labelledby="confirmTitle"
+    aria-describedby="confirmMessage"
+  >
+    <div class="modal-card confirm-modal-card">
+      <h2 id="confirmTitle" class="modal-title">Confirmation</h2>
+
+      <p id="confirmMessage" class="confirm-message">
+        Êtes-vous sûr ?
+      </p>
+
+      <div class="confirm-actions">
+        <button id="confirmCancelBtn" class="btn btn-secondary" type="button">
+          Annuler
+        </button>
+
+        <button id="confirmOkBtn" class="btn btn-danger" type="button">
+          Confirmer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./vendor/sortable.min.js" defer></script>
+  <script src="./vendor/jszip.min.js" defer></script>
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

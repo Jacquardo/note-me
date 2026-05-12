@@ -1,0 +1,64 @@
+{
+  "name": "Notes Me V11",
+  "short_name": "NotesMe",
+  "description": "Application locale de gestion de notes avec pièces jointes, favoris, corbeille, recherche avancée, export ZIP et mode hors ligne.",
+  "id": "./",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "any",
+  "background_color": "#07111f",
+  "theme_color": "#4fc7ff",
+  "categories": ["productivity", "utilities"],
+  "lang": "fr",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "./assets/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nouvelle note",
+      "short_name": "Nouvelle",
+      "description": "Créer une nouvelle note",
+      "url": "./index.html?action=new-note",
+      "icons": [
+        {
+          "src": "./assets/logo.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Mes favoris",
+      "short_name": "Favoris",
+      "description": "Afficher les notes favorites",
+      "url": "./index.html?filter=favorites",
+      "icons": [
+        {
+          "src": "./assets/logo.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "notes-me-v11",
+  "version": "11.0.0",
+  "description": "Application locale de gestion de notes avec pièces jointes, favoris, corbeille, recherche avancée, export ZIP et PWA.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "vite --host 127.0.0.1 --port 5173",
+    "dev": "vite --host 127.0.0.1 --port 5173",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4173",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:ui": "vitest --ui",
+    "coverage": "vitest run --coverage"
+  },
+  "keywords": [
+    "notes",
+    "indexeddb",
+    "pwa",
+    "zip",
+    "offline",
+    "productivity"
+  ],
+  "author": "Notes Me",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@vitest/coverage-v8": "^3.0.0",
+    "@vitest/ui": "^3.0.0",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0"
+  }
+}

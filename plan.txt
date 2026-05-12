@@ -1,0 +1,82 @@
+notes-me-v11/
+  index.html
+  manifest.webmanifest
+  sw.js
+
+  assets/
+    logo.png
+    img1.png
+    img2.png
+    img3.png
+    img4.png
+    img5.png
+    img6.png
+    img7.png
+    img8.png
+    img9.png
+    img10.png
+
+  css/
+    variables.css
+    base.css
+    layout.css
+    components.css
+    notes.css
+    modals.css
+    responsive.css
+
+  js/
+    app.js
+    state.js
+
+    config/
+      constants.js
+      backgrounds.js
+
+    db/
+      database.js
+      migrations.js
+      notesRepository.js
+      filesRepository.js
+      versionsRepository.js
+      settingsRepository.js
+
+    services/
+      exportZip.js
+      importZip.js
+      search.js
+      storage.js
+      history.js
+      pwa.js
+
+    ui/
+      dom.js
+      toast.js
+      modals.js
+      notesRenderer.js
+      listViews.js
+      emptyState.js
+      accessibility.js
+      settingsPanel.js
+
+    utils/
+      debounce.js
+      dates.js
+      files.js
+      colors.js
+      ids.js
+      text.js
+
+  vendor/
+    sortable.min.js
+    jszip.min.js
+
+  tests/
+    search.test.js
+    colors.test.js
+    files.test.js
+    tags.test.js
+    migrations.test.js
+
+  package.json
+  vitest.config.js
