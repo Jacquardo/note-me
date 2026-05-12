@@ -1,0 +1,159 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@700;800&display=swap');
+
+:root {
+  --accent-a: #4fc7ff;
+  --accent-b: #ffc83d;
+  --accent-success: #22c55e;
+  --accent-warning: #f59e0b;
+  --accent-danger: #ef4444;
+
+  --page-bg: #07111f;
+  --page-overlay-top: rgba(7, 17, 31, 0.66);
+  --page-overlay-bottom: rgba(7, 17, 31, 0.84);
+  --page-a: rgba(79, 199, 255, 0.15);
+  --page-b: rgba(255, 200, 61, 0.10);
+
+  --panel-bg-strong: linear-gradient(180deg, rgba(14, 24, 42, 0.88), rgba(10, 18, 34, 0.78));
+  --panel-bg-solid: rgba(10, 18, 34, 0.94);
+  --panel-border: rgba(255, 255, 255, 0.10);
+
+  --surface-soft: rgba(255, 255, 255, 0.07);
+  --surface-soft-2: rgba(255, 255, 255, 0.10);
+  --surface-muted: rgba(255, 255, 255, 0.04);
+
+  --text-main: #f8fbff;
+  --text-soft: rgba(248, 251, 255, 0.84);
+  --text-muted: rgba(248, 251, 255, 0.58);
+  --text-inverted: #07111f;
+
+  --input-bg: rgba(255, 255, 255, 0.06);
+  --input-border: rgba(255, 255, 255, 0.14);
+  --input-placeholder: rgba(248, 251, 255, 0.48);
+
+  --ghost-bg: rgba(255, 255, 255, 0.08);
+  --ghost-border: rgba(255, 255, 255, 0.10);
+
+  --overlay: rgba(3, 7, 18, 0.66);
+  --modal-surface: linear-gradient(180deg, rgba(10, 18, 33, 0.98), rgba(7, 13, 26, 0.98));
+  --modal-text: #f8fbff;
+  --modal-border: rgba(255, 255, 255, 0.12);
+
+  --editor-surface: linear-gradient(180deg, rgba(10, 18, 33, 0.98), rgba(7, 13, 26, 0.98));
+  --editor-text: #f8fbff;
+
+  --focus-ring: rgba(79, 199, 255, 0.45);
+  --focus-ring-strong: rgba(79, 199, 255, 0.70);
+
+  --btn-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
+  --btn-shadow-hover: 0 14px 28px rgba(0, 0, 0, 0.20);
+
+  --shadow-xs: 0 4px 10px rgba(0, 0, 0, 0.10);
+  --shadow-sm: 0 8px 18px rgba(0, 0, 0, 0.14);
+  --shadow-md: 0 14px 30px rgba(0, 0, 0, 0.18);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.24);
+
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+
+  --font-main: Inter, Arial, "Segoe UI", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  --font-title: Poppins, Inter, Arial, sans-serif;
+
+  --note-min: 260px;
+  --note-max: 310px;
+  --note-h: 290px;
+  --app-padding: 24px;
+
+  --header-z: 30;
+  --menu-z: 60;
+  --modal-z: 1000;
+  --toast-z: 2000;
+
+  --transition-fast: 0.16s ease;
+  --transition-normal: 0.22s ease;
+  --transition-slow: 0.32s ease;
+}
+
+html[data-theme="light"] {
+  --accent-a: #1597d8;
+  --accent-b: #f4b942;
+
+  --page-bg: #edf4fb;
+  --page-overlay-top: rgba(237, 244, 251, 0.78);
+  --page-overlay-bottom: rgba(237, 244, 251, 0.90);
+  --page-a: rgba(21, 151, 216, 0.10);
+  --page-b: rgba(244, 185, 66, 0.08);
+
+  --panel-bg-strong: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(255, 255, 255, 0.91));
+  --panel-bg-solid: rgba(255, 255, 255, 0.96);
+  --panel-border: rgba(15, 23, 36, 0.08);
+
+  --surface-soft: rgba(255, 255, 255, 0.66);
+  --surface-soft-2: rgba(255, 255, 255, 0.82);
+  --surface-muted: rgba(15, 23, 36, 0.04);
+
+  --text-main: #0f1724;
+  --text-soft: rgba(15, 23, 36, 0.78);
+  --text-muted: rgba(15, 23, 36, 0.52);
+  --text-inverted: #f8fbff;
+
+  --input-bg: rgba(255, 255, 255, 0.94);
+  --input-border: rgba(15, 23, 36, 0.12);
+  --input-placeholder: rgba(15, 23, 36, 0.45);
+
+  --ghost-bg: rgba(255, 255, 255, 0.78);
+  --ghost-border: rgba(15, 23, 36, 0.08);
+
+  --overlay: rgba(15, 23, 36, 0.38);
+  --modal-surface: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(249, 250, 251, 1));
+  --modal-text: #0f1724;
+  --modal-border: rgba(15, 23, 36, 0.08);
+
+  --editor-surface: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(246, 248, 251, 0.99));
+  --editor-text: #0f1724;
+
+  --btn-shadow: 0 8px 18px rgba(15, 23, 36, 0.08);
+  --btn-shadow-hover: 0 14px 28px rgba(15, 23, 36, 0.12);
+
+  --shadow-xs: 0 4px 10px rgba(15, 23, 36, 0.05);
+  --shadow-sm: 0 8px 18px rgba(15, 23, 36, 0.07);
+  --shadow-md: 0 14px 30px rgba(15, 23, 36, 0.10);
+  --shadow-lg: 0 22px 48px rgba(15, 23, 36, 0.12);
+}
+
+@media (min-width: 1600px) {
+  :root {
+    --note-min: 290px;
+    --note-max: 340px;
+    --note-h: 310px;
+    --app-padding: 40px;
+  }
+}
+
+@media (max-width: 1599px) and (min-width: 1200px) {
+  :root {
+    --note-min: 250px;
+    --note-max: 300px;
+    --note-h: 280px;
+    --app-padding: 24px;
+  }
+}
+
+@media (max-width: 1199px) {
+  :root {
+    --note-min: 240px;
+    --note-max: 280px;
+    --note-h: 270px;
+    --app-padding: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0.01ms linear;
+    --transition-normal: 0.01ms linear;
+    --transition-slow: 0.01ms linear;
+  }
+}
