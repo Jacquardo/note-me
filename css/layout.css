@@ -1,0 +1,236 @@
+.app-shell {
+  width: 100%;
+  min-height: calc(100vh - calc(var(--app-padding) * 2));
+}
+
+.title-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  width: 100%;
+  margin-bottom: 24px;
+  padding: 18px 24px;
+  border-radius: var(--radius-lg);
+  background: var(--panel-bg-strong);
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(16px) saturate(115%);
+  position: relative;
+  z-index: var(--header-z);
+}
+
+.brand-block {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.brand-block img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 6px;
+  box-shadow: var(--shadow-xs);
+  flex: 0 0 auto;
+}
+
+.brand-text {
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, var(--accent-a) 0%, var(--accent-b) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  white-space: nowrap;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.top-nav {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.top-nav-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 280px;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 18px;
+  background: var(--panel-bg-solid);
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(16px);
+  z-index: var(--menu-z);
+}
+
+.top-nav-menu.open {
+  display: flex;
+}
+
+.main-content {
+  width: 100%;
+}
+
+.topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+  padding: 14px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-soft);
+  border: 1px solid var(--ghost-border);
+  box-shadow: var(--shadow-xs);
+  backdrop-filter: blur(12px);
+}
+
+.filters-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-soft);
+  border: 1px solid var(--ghost-border);
+  box-shadow: var(--shadow-xs);
+  backdrop-filter: blur(12px);
+}
+
+.toolbar-search {
+  flex: 1 1 320px;
+  min-width: min(100%, 280px);
+  max-width: 520px;
+}
+
+.toolbar-mini {
+  min-width: 170px;
+  max-width: 230px;
+  flex: 0 0 auto;
+}
+
+.stats {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: stretch;
+  justify-content: flex-end;
+}
+
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-bottom: 18px;
+  padding: 14px 20px;
+  border-radius: 18px;
+  background: var(--surface-soft);
+  border: 1px solid var(--ghost-border);
+  box-shadow: var(--shadow-xs);
+  backdrop-filter: blur(12px);
+}
+
+.load-more-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 22px 0 4px;
+}
+
+.editor-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.editor-main,
+.editor-side {
+  min-width: 0;
+}
+
+.editor-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+}
+
+.field-group {
+  display: grid;
+  gap: 8px;
+}
+
+.settings-grid {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.image-toolbar,
+.editor-header,
+.editor-actions,
+.confirm-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.editor-header {
+  margin-bottom: 18px;
+}
+
+.editor-header-actions,
+.file-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.editor-actions,
+.confirm-actions {
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
