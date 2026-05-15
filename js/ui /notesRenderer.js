@@ -382,8 +382,14 @@ function applyNoteStyle(item, note) {
   item.style.setProperty('--note-bg-base', color);
 
   if (note.backgroundImage) {
+  try {
+    const abs = new URL(String(note.backgroundImage), window.location.href).href;
+    item.style.setProperty('--note-image-url', `url("${cssEscapeUrl(abs)}")`);
+  } catch (err) {
+    // fallback si la valeur n'est pas un chemin relatif/valide
     item.style.setProperty('--note-image-url', `url("${cssEscapeUrl(note.backgroundImage)}")`);
   }
+}
 
   const rotation = getStableRotation(note.id);
   item.style.setProperty('--rot', `${rotation}deg`);
