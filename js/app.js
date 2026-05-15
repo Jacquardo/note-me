@@ -387,18 +387,17 @@ function createNoteElementFallback(note) {
   }
 
   if (note.backgroundImage) {
-  try {
-    // Résout le chemin relatif en URL absolue par rapport à la page
-    const abs = new URL(String(note.backgroundImage), window.location.href).href;
-    // échappement simple pour éviter guillemets/backslash
-    const safe = abs.replace(/["\\]/g, '');
-    item.style.setProperty('--note-image-url', `url("${safe}")`);
-  } catch (err) {
-    // fallback si la valeur n'est pas un chemin valide
-    const safe = String(note.backgroundImage).replace(/["\\]/g, '');
-    item.style.setProperty('--note-image-url', `url("${safe}")`);
+    const bgValue = String(note.backgroundImage).trim();
+    const safe = bgValue.replace(/["\\]/g, '');
+
+    // Vérifie si c'est un dégradé CSS (gradient) ou une image
+    if (safe.startsWith('linear-gradient') || safe.startsWith('radial-gradient')) {
+      item.style.setProperty('--note-image-url', safe);
+    } else {
+      // C'est un chemin d'image (ex: ./assets/img1.png)
+      item.style.setProperty('--note-image-url', `url("${safe}")`);
+    }
   }
-}
 
   if (note.deletedAt) {
     item.classList.add('is-deleted');
