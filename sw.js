@@ -3,7 +3,7 @@ const REQUIRED_ASSETS = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './assets/logo.png'
+  'assets/logo.png'
 ];
 
 const OPTIONAL_ASSETS = [
@@ -54,16 +54,16 @@ const OPTIONAL_ASSETS = [
   './vendor/sortable.min.js',
   './vendor/jszip.min.js',
 
-  './assets/img1.png',
-  './assets/img2.png',
-  './assets/img3.png',
-  './assets/img4.png',
-  './assets/img5.png',
-  './assets/img6.png',
-  './assets/img7.png',
-  './assets/img8.png',
-  './assets/img9.png',
-  './assets/img10.png'
+  'assets/img1.png',
+  'assets/img2.png',
+  'assets/img3.png',
+  'assets/img4.png',
+  'assets/img5.png',
+  'assets/img6.png',
+  'assets/img7.png',
+  'assets/img8.png',
+  'assets/img9.png',
+  'assets/img10.png'
 ];
 
 self.addEventListener('install', (event) => {
