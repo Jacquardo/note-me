@@ -1,6 +1,4 @@
-const CACHE_VERSION = 'v11.0.0';
-const CACHE_NAME = `notes-me-${CACHE_VERSION}`;
-
+const CACHE_VERSION = 'v11.0.1'; // Change le numéro à chaque mise à jour !const CACHE_NAME = `notes-me-${CACHE_VERSION}`;
 const REQUIRED_ASSETS = [
   './',
   './index.html',
