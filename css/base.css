@@ -23,7 +23,7 @@ body {
     radial-gradient(circle at top left, var(--page-a), transparent 34%),
     radial-gradient(circle at bottom right, var(--page-b), transparent 28%),
     linear-gradient(180deg, var(--page-overlay-top), var(--page-overlay-bottom)),
-    url("../assets/logo.png") center center / cover no-repeat fixed,
+    url("assets/logo.png") center center / cover no-repeat fixed,
     var(--page-bg);
   padding: var(--app-padding);
   -webkit-font-smoothing: antialiased;
