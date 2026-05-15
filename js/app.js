@@ -387,8 +387,18 @@ function createNoteElementFallback(note) {
   }
 
   if (note.backgroundImage) {
-    item.style.setProperty('--note-image-url', `url("${note.backgroundImage}")`);
+  try {
+    // Résout le chemin relatif en URL absolue par rapport à la page
+    const abs = new URL(String(note.backgroundImage), window.location.href).href;
+    // échappement simple pour éviter guillemets/backslash
+    const safe = abs.replace(/["\\]/g, '');
+    item.style.setProperty('--note-image-url', `url("${safe}")`);
+  } catch (err) {
+    // fallback si la valeur n'est pas un chemin valide
+    const safe = String(note.backgroundImage).replace(/["\\]/g, '');
+    item.style.setProperty('--note-image-url', `url("${safe}")`);
   }
+}
 
   if (note.deletedAt) {
     item.classList.add('is-deleted');
