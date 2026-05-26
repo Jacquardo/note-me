@@ -145,8 +145,18 @@
           <button id="helpBtn" class="nav-menu-btn btn btn-secondary" type="button">
             ❔ Aide
           </button>
+          
+          <button id="logoutBtn" class="nav-menu-btn btn btn-danger" type="button" hidden>
+            🚪 Se déconnecter
+          </button>
         </div>
       </nav>
+      <!-- Infos utilisateur connecté -->
+    <div id="userInfoBlock" class="user-info-block" hidden>
+      <img id="userAvatar" class="user-avatar" src="" alt="Avatar utilisateur">
+      <span id="userDisplayName" class="user-display-name"></span>
+    </div>
+      
     </header>
 
     <main id="mainContent" class="main-content" role="main" tabindex="-1">
