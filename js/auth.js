@@ -48,8 +48,9 @@ function _setupGoogleSignIn(resolve) {
       _handleCredentialResponse(response);
       resolve(currentUser);
     },
-    auto_select: true,
+    auto_select: false,           // ← désactive la sélection automatique
     cancel_on_tap_outside: false,
+    ux_mode: 'popup',             // ← force le mode popup (évite le redirect)
   });
 
   _showLoginOverlay();
@@ -57,19 +58,21 @@ function _setupGoogleSignIn(resolve) {
   google.accounts.id.renderButton(
     document.getElementById('googleSignInBtn'),
     {
-      theme: 'outline',
-      size: 'large',
-      text: 'signin_with',
-      shape: 'rectangular',
-      width: 280,
-      locale: 'fr',
+      theme:     'outline',
+      size:      'large',
+      text:      'signin_with',
+      shape:     'rectangular',
+      width:     280,
+      locale:    'fr',
+      ux_mode:   'popup',         // ← force popup au niveau du bouton aussi
     }
   );
 
-  // Déclenche le One Tap si disponible
+  // One Tap en supplément si disponible
   google.accounts.id.prompt((notification) => {
     if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-      // One Tap non disponible, le bouton manuel prend le relais
+      // One Tap non disponible, le bouton manuel suffit
+      console.info('One Tap non disponible :', notification.getNotDisplayedReason?.() || notification.getSkippedReason?.());
     }
   });
 }
