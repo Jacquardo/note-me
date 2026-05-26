@@ -22,6 +22,8 @@ import {
   updatePagination,
   upsertNoteInState
 } from './state.js';
+// ── Authentification Google ───────────────────────────────
+import { initAuth, signOut } from './auth.js';
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -32,49 +34,38 @@ window.addEventListener('beforeunload', () => {
 });
 
 async function init() {
-  hydrateRefs();
+  // ── 1. Authentification Google (bloque jusqu'à connexion) ──
+  try {
+    await initAuth();
+  } catch (authError) {
+    console.error('Erreur authentification Google :', authError);
+    return; // Bloque le démarrage si l'auth échoue
+  }
 
+  // ── 2. Démarrage normal de l'application ──────────────────
+  hydrateRefs();
   bindEssentialUi();
 
   try {
-    setState({
-      isLoading: true
-    });
-
+    setState({ isLoading: true });
     await loadOptionalModules();
-
     restoreLocalPreferences();
     await initDatabase();
     await restoreSettings();
-
     bindApplicationUi();
-
     await loadNotes();
     await renderApp();
-
-    setState({
-      isReady: true,
-      isLoading: false
-    });
-
-    showToast(`Notes Me V${APP_VERSION} est prêt.`, 'success', {
-      duration: 1800
-    });
-
+    setState({ isReady: true, isLoading: false });
+    showToast(`Notes Me V${APP_VERSION} est prêt.`, 'success', { duration: 1800 });
     handleInitialUrlActions();
   } catch (error) {
     console.error('Erreur critique au démarrage :', error);
-
-    setState({
-      isLoading: false
-    });
-
+    setState({ isLoading: false });
     showToast(
       'Impossible de démarrer Notes Me. Le menu reste disponible, mais certaines fonctions peuvent être désactivées.',
       'error',
       { duration: 8000 }
     );
-
     renderFatalError(error);
   }
 }
@@ -84,6 +75,31 @@ function bindEssentialUi() {
   bindTheme();
   bindBasicModalButtons();
   bindKeyboardShortcuts();
+  bindLogout();
+}
+
+// ─────────────────────────────────────────────────────────────
+// Déconnexion Google
+// ─────────────────────────────────────────────────────────────
+
+function bindLogout() {
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  if (!logoutBtn || logoutBtn.dataset.bound === 'true') return;
+
+  logoutBtn.dataset.bound = 'true';
+
+  logoutBtn.addEventListener('click', async () => {
+    const confirmed = await askConfirmation(
+      'Se déconnecter',
+      'Vous allez être déconnecté de Notes Me. Vos données locales restent intactes.'
+    );
+
+    if (!confirmed) return;
+
+    signOut();
+    showToast('Vous avez été déconnecté.', 'info');
+  });
 }
 
 function bindApplicationUi() {
