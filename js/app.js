@@ -24,7 +24,8 @@ import {
 } from './state.js';
 // ── Authentification Google ───────────────────────────────
 import { initAuth, signOut } from './auth.js';
- import {
+
+import {
   initGoogleDriveAuth,
   loadNotesFromGoogleDrive,
   saveNotesToGoogleDrive,
@@ -42,13 +43,17 @@ window.addEventListener('beforeunload', () => {
 async function init() {
   try {
     await initAuth();
-    await initGoogleDriveAuth();
   } catch (authError) {
     console.error('Erreur authentification Google :', authError);
     return;
   }
 
-  // ── 2. Démarrage normal de l'application ──────────────────
+  try {
+    await initGoogleDriveAuth();
+  } catch (driveError) {
+    console.warn('Google Drive Sync non initialisé. Mode local uniquement.', driveError);
+  }
+
   hydrateRefs();
   bindEssentialUi();
 
@@ -289,18 +294,26 @@ async function loadNotes() {
   }
 }
 
-async function persistNotesToGoogleDrive() {
-  try {
-    await saveNotesToGoogleDrive(state.notes);
-  } catch (error) {
-    console.error('Erreur synchronisation Google Drive :', error);
+let googleDriveSyncQueue = Promise.resolve();
 
-    showToast(
-      'Note enregistrée localement, mais pas encore synchronisée avec Google Drive.',
-      'warning',
-      { duration: 5000 }
-    );
-  }
+function persistNotesToGoogleDrive() {
+  googleDriveSyncQueue = googleDriveSyncQueue
+    .catch(() => {})
+    .then(async () => {
+      try {
+        await saveNotesToGoogleDrive(state.notes);
+      } catch (error) {
+        console.error('Erreur synchronisation Google Drive :', error);
+
+        showToast(
+          'Note enregistrée localement, mais pas encore synchronisée avec Google Drive.',
+          'warning',
+          { duration: 5000 }
+        );
+      }
+    });
+
+  return googleDriveSyncQueue;
 }
 
 async function renderApp() {
@@ -1592,15 +1605,25 @@ async function importZip(event) {
   try {
     await importModule.importBackupZip(file);
 
-    await loadNotes();
+    const notesRepository = state.modules.notesRepository;
+    let importedNotes = [];
 
-await persistNotesToGoogleDrive();
+    if (notesRepository && typeof notesRepository.getAllNotesFromDB === 'function') {
+      const notes = await notesRepository.getAllNotesFromDB();
+      importedNotes = Array.isArray(notes) ? notes : [];
+    }
 
-resetPagination();
-await renderApp();
+    setState({
+      notes: importedNotes,
+      filteredNotes: []
+    });
 
-showToast('Import ZIP terminé et synchronisé avec Google Drive.', 'success');
-    
+    await persistNotesToGoogleDrive();
+
+    resetPagination();
+    await renderApp();
+
+    showToast('Import ZIP terminé et synchronisé avec Google Drive.', 'success');
   } catch (error) {
     console.error('Erreur import ZIP :', error);
     showToast('Impossible d’importer le ZIP.', 'error');
@@ -1608,7 +1631,7 @@ showToast('Import ZIP terminé et synchronisé avec Google Drive.', 'success');
     refs.importZipInput.value = '';
   }
 }
-
+  
 function openSettings() {
   syncSettingsForm();
   openModal(refs.settingsModal, refs.defaultViewModeSelect);
