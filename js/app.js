@@ -24,6 +24,12 @@ import {
 } from './state.js';
 // ── Authentification Google ───────────────────────────────
 import { initAuth, signOut } from './auth.js';
+ import {
+  initGoogleDriveAuth,
+  loadNotesFromGoogleDrive,
+  saveNotesToGoogleDrive,
+  clearGoogleDriveSession
+} from './google-drive-sync.js';
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -34,12 +40,12 @@ window.addEventListener('beforeunload', () => {
 });
 
 async function init() {
-  // ── 1. Authentification Google (bloque jusqu'à connexion) ──
   try {
     await initAuth();
+    await initGoogleDriveAuth();
   } catch (authError) {
     console.error('Erreur authentification Google :', authError);
-    return; // Bloque le démarrage si l'auth échoue
+    return;
   }
 
   // ── 2. Démarrage normal de l'application ──────────────────
@@ -97,7 +103,9 @@ function bindLogout() {
 
     if (!confirmed) return;
 
+    clearGoogleDriveSession();
     signOut();
+
     showToast('Vous avez été déconnecté.', 'info');
   });
 }
@@ -218,33 +226,80 @@ function restoreLocalPreferences() {
 async function loadNotes() {
   const notesRepository = state.modules.notesRepository;
 
-  if (!notesRepository || typeof notesRepository.getAllNotesFromDB !== 'function') {
-    setState({
-      notes: [],
-      filteredNotes: []
-    });
+  let localNotes = [];
 
-    return [];
+  if (notesRepository && typeof notesRepository.getAllNotesFromDB === 'function') {
+    try {
+      const notes = await notesRepository.getAllNotesFromDB();
+      localNotes = Array.isArray(notes) ? notes : [];
+    } catch (error) {
+      console.warn('Impossible de charger les notes locales IndexedDB.', error);
+    }
   }
 
   try {
-    const notes = await notesRepository.getAllNotesFromDB();
+    showToast('Chargement des notes Google Drive...', 'info', { duration: 1800 });
+
+    const googleNotes = await loadNotesFromGoogleDrive();
+
+    let finalNotes = Array.isArray(googleNotes) ? googleNotes : [];
+
+    /*
+      Première synchronisation :
+      si Google Drive est vide mais IndexedDB contient déjà des notes,
+      on envoie les notes locales vers Google Drive.
+    */
+    if (finalNotes.length === 0 && localNotes.length > 0) {
+      finalNotes = localNotes;
+      await saveNotesToGoogleDrive(finalNotes);
+      showToast('Notes locales migrées vers Google Drive.', 'success');
+    }
 
     setState({
-      notes: Array.isArray(notes) ? notes : []
-    });
-
-    return state.notes;
-  } catch (error) {
-    console.error('Erreur de chargement des notes :', error);
-    showToast('Impossible de charger les notes.', 'error');
-
-    setState({
-      notes: [],
+      notes: finalNotes,
       filteredNotes: []
     });
 
-    return [];
+    /*
+      Cache local :
+      on garde aussi une copie locale dans IndexedDB.
+    */
+    if (notesRepository && typeof notesRepository.saveNoteToDB === 'function') {
+      for (const note of finalNotes) {
+        await notesRepository.saveNoteToDB(note);
+      }
+    }
+
+    return state.notes;
+  } catch (error) {
+    console.error('Erreur de chargement Google Drive :', error);
+
+    showToast(
+      'Google Drive indisponible. Chargement depuis la copie locale.',
+      'warning',
+      { duration: 5000 }
+    );
+
+    setState({
+      notes: localNotes,
+      filteredNotes: []
+    });
+
+    return state.notes;
+  }
+}
+
+async function persistNotesToGoogleDrive() {
+  try {
+    await saveNotesToGoogleDrive(state.notes);
+  } catch (error) {
+    console.error('Erreur synchronisation Google Drive :', error);
+
+    showToast(
+      'Note enregistrée localement, mais pas encore synchronisée avec Google Drive.',
+      'warning',
+      { duration: 5000 }
+    );
   }
 }
 
@@ -1213,11 +1268,14 @@ async function saveCurrentNote() {
 
     upsertNoteInState(note);
 
+     await persistNotesToGoogleDrive();
+
     closeEditor();
     resetPagination();
     await renderApp();
 
-    showToast(existingNote ? 'Note modifiée.' : 'Note créée.', 'success');
+     showToast(existingNote ? 'Note modifiée.' : 'Note créée.', 'success');
+    
   } catch (error) {
     console.error('Erreur lors de la sauvegarde :', error);
     showToast('Impossible d’enregistrer la note.', 'error');
@@ -1374,12 +1432,15 @@ async function deleteNote(noteId) {
       await notesRepository.saveNoteToDB(updatedNote);
     }
 
-    upsertNoteInState(updatedNote);
+  upsertNoteInState(updatedNote);
 
-    resetPagination();
-    await renderApp();
+  await persistNotesToGoogleDrive();
 
-    showToast('Note déplacée dans la corbeille.', 'success');
+  resetPagination();
+  await renderApp();
+
+  showToast('Note déplacée dans la corbeille.', 'success');
+    
   } catch (error) {
     console.error('Erreur suppression note :', error);
     showToast('Impossible de supprimer la note.', 'error');
@@ -1406,10 +1467,13 @@ async function restoreNote(noteId) {
 
     upsertNoteInState(updatedNote);
 
-    resetPagination();
-    await renderApp();
+   await persistNotesToGoogleDrive();
 
-    showToast('Note restaurée.', 'success');
+   resetPagination();
+   await renderApp();
+
+  showToast('Note restaurée.', 'success');
+    
   } catch (error) {
     console.error('Erreur restauration note :', error);
     showToast('Impossible de restaurer la note.', 'error');
@@ -1436,10 +1500,13 @@ async function toggleFavorite(noteId) {
 
     upsertNoteInState(updatedNote);
 
-    resetPagination();
-    await renderApp();
+  await persistNotesToGoogleDrive();
 
-    showToast(updatedNote.favorite ? 'Note ajoutée aux favoris.' : 'Note retirée des favoris.', 'success');
+  resetPagination();
+  await renderApp();
+
+showToast(updatedNote.favorite ? 'Note ajoutée aux favoris.' : 'Note retirée des favoris.', 'success');
+    
   } catch (error) {
     console.error('Erreur favori :', error);
     showToast('Impossible de modifier le favori.', 'error');
@@ -1472,10 +1539,13 @@ async function emptyTrash() {
 
     state.notes = state.notes.filter((note) => !note.deletedAt);
 
-    resetPagination();
-    await renderApp();
+await persistNotesToGoogleDrive();
 
-    showToast('Corbeille vidée.', 'success');
+resetPagination();
+await renderApp();
+
+showToast('Corbeille vidée.', 'success');
+    
   } catch (error) {
     console.error('Erreur vidage corbeille :', error);
     showToast('Impossible de vider la corbeille.', 'error');
@@ -1523,10 +1593,14 @@ async function importZip(event) {
     await importModule.importBackupZip(file);
 
     await loadNotes();
-    resetPagination();
-    await renderApp();
 
-    showToast('Import ZIP terminé.', 'success');
+await persistNotesToGoogleDrive();
+
+resetPagination();
+await renderApp();
+
+showToast('Import ZIP terminé et synchronisé avec Google Drive.', 'success');
+    
   } catch (error) {
     console.error('Erreur import ZIP :', error);
     showToast('Impossible d’importer le ZIP.', 'error');
