@@ -8,25 +8,25 @@
 
   <!-- CSP mise à jour pour autoriser Google Identity Services -->
   <meta
-    http-equiv="Content-Security-Policy"
-    content="
-      default-src 'self';
-      script-src 'self' https://accounts.google.com/gsi/client;
-      style-src 'self' https://fonts.googleapis.com https://accounts.google.com 'unsafe-inline';
-      font-src 'self' https://fonts.gstatic.com;
-      img-src 'self' blob: data: https://*.googleusercontent.com;
-      media-src 'self' blob:;
-      object-src 'none';
-      frame-src 'self' blob: https://accounts.google.com;
-      connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://www.googleapis.com;
-      manifest-src 'self';
-      worker-src 'self';
-      base-uri 'self';
-      form-action 'self';
-    "
-  >
+  http-equiv="Content-Security-Policy"
+  content="
+    default-src 'self';
+    script-src 'self' https://accounts.google.com/gsi/client;
+    style-src 'self' https://fonts.googleapis.com https://accounts.google.com 'unsafe-inline';
+    font-src 'self' https://fonts.gstatic.com;
+    img-src 'self' blob: data: https://*.googleusercontent.com;
+    media-src 'self' blob:;
+    object-src 'none';
+    frame-src 'self' blob: https://accounts.google.com;
+    connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://www.googleapis.com;
+    manifest-src 'self';
+    worker-src 'self';
+    base-uri 'self';
+    form-action 'self';
+  "
+>
 
-  <meta name="description" content="Notes Me, application locale de gestion de notes avec pièces jointes, favoris, corbeille, recherche avancée, export ZIP et mode hors ligne.">
+  <meta name="description" content="Notes Me, application de gestion de notes avec synchronisation Google Drive, pièces jointes, favoris, corbeille, recherche avancée, export ZIP et mode hors ligne.">
   <meta name="theme-color" content="#07111f">
   <meta name="color-scheme" content="dark light">
   <meta name="application-name" content="Notes Me">
@@ -78,8 +78,8 @@
     <div id="googleSignInBtn" aria-label="Se connecter avec Google"></div>
 
     <p class="login-privacy">
-      Vos notes sont synchronisées dans votre Google Drive privé.<br>
-      L’application utilise uniquement son espace dédié.
+  Vos notes sont synchronisées dans l’espace privé Google Drive de l’application.<br>
+  Elles ne sont pas visibles dans votre Drive classique.
     </p>
   </div>
 </div>
@@ -91,7 +91,7 @@
         <img src="./assets/logo.png" alt="Logo Notes Me" width="56" height="56">
         <div class="brand-text">
           <h1 class="title">Notes Me</h1>
-          <p class="subtitle">Dashboard local de notes</p>
+          <p class="subtitle">Dashboard de notes synchronisées</p>
         </div>
       </div>
 
@@ -529,7 +529,7 @@
 
       <div class="help-content">
         <p>
-          Notes Me permet de créer des notes locales avec catégories, tags, favoris, pièces jointes et corbeille.
+          Notes Me permet de créer des notes synchronisées avec Google Drive, avec catégories, tags, favoris, pièces jointes et corbeille.
         </p>
 
         <h3>Recherche avancée</h3>
