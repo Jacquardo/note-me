@@ -229,11 +229,6 @@ function restoreLocalPreferences() {
 }
 
 async function loadNotes() {
-
-  setSyncStatus('Synchronisation Google Drive...', 'syncing');
-await saveNotesToGoogleDrive(state.notes);
-setSyncStatus('Synchronisé avec Google Drive', 'success');
-  
   const notesRepository = state.modules.notesRepository;
 
   let localNotes = [];
@@ -248,17 +243,13 @@ setSyncStatus('Synchronisé avec Google Drive', 'success');
   }
 
   try {
+    setSyncStatus('Chargement Google Drive...', 'syncing');
     showToast('Chargement des notes Google Drive...', 'info', { duration: 1800 });
 
     const googleNotes = await loadNotesFromGoogleDrive();
 
     let finalNotes = Array.isArray(googleNotes) ? googleNotes : [];
 
-    /*
-      Première synchronisation :
-      si Google Drive est vide mais IndexedDB contient déjà des notes,
-      on envoie les notes locales vers Google Drive.
-    */
     if (finalNotes.length === 0 && localNotes.length > 0) {
       finalNotes = localNotes;
       await saveNotesToGoogleDrive(finalNotes);
@@ -270,18 +261,34 @@ setSyncStatus('Synchronisé avec Google Drive', 'success');
       filteredNotes: []
     });
 
-    /*
-      Cache local :
-      on garde aussi une copie locale dans IndexedDB.
-    */
     if (notesRepository && typeof notesRepository.saveNoteToDB === 'function') {
       for (const note of finalNotes) {
         await notesRepository.saveNoteToDB(note);
       }
     }
 
+    setSyncStatus('Synchronisé avec Google Drive', 'success');
+
     return state.notes;
   } catch (error) {
+    console.error('Erreur de chargement Google Drive :', error);
+
+    setSyncStatus('Mode local', 'error');
+
+    showToast(
+      'Google Drive indisponible. Chargement depuis la copie locale.',
+      'warning',
+      { duration: 5000 }
+    );
+
+    setState({
+      notes: localNotes,
+      filteredNotes: []
+    });
+
+    return state.notes;
+  }
+} catch (error) {
     console.error('Erreur de chargement Google Drive :', error);
 
     showToast(
@@ -302,18 +309,19 @@ setSyncStatus('Synchronisé avec Google Drive', 'success');
 let googleDriveSyncQueue = Promise.resolve();
 
 function persistNotesToGoogleDrive() {
-  
-   setSyncStatus('Synchronisation Google Drive...', 'syncing');
-await saveNotesToGoogleDrive(state.notes);
-setSyncStatus('Synchronisé avec Google Drive', 'success');
-  
   googleDriveSyncQueue = googleDriveSyncQueue
     .catch(() => {})
     .then(async () => {
       try {
+        setSyncStatus('Synchronisation Google Drive...', 'syncing');
+
         await saveNotesToGoogleDrive(state.notes);
+
+        setSyncStatus('Synchronisé avec Google Drive', 'success');
       } catch (error) {
         console.error('Erreur synchronisation Google Drive :', error);
+
+        setSyncStatus('Erreur de synchronisation', 'error');
 
         showToast(
           'Note enregistrée localement, mais pas encore synchronisée avec Google Drive.',
