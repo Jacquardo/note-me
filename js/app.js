@@ -229,6 +229,11 @@ function restoreLocalPreferences() {
 }
 
 async function loadNotes() {
+
+  setSyncStatus('Synchronisation Google Drive...', 'syncing');
+await saveNotesToGoogleDrive(state.notes);
+setSyncStatus('Synchronisé avec Google Drive', 'success');
+  
   const notesRepository = state.modules.notesRepository;
 
   let localNotes = [];
@@ -297,6 +302,11 @@ async function loadNotes() {
 let googleDriveSyncQueue = Promise.resolve();
 
 function persistNotesToGoogleDrive() {
+  
+   setSyncStatus('Synchronisation Google Drive...', 'syncing');
+await saveNotesToGoogleDrive(state.notes);
+setSyncStatus('Synchronisé avec Google Drive', 'success');
+  
   googleDriveSyncQueue = googleDriveSyncQueue
     .catch(() => {})
     .then(async () => {
@@ -346,6 +356,18 @@ async function renderApp() {
   }
 
   renderNotesFallback(notes);
+}
+
+function setSyncStatus(message, type = 'info') {
+  const block = document.getElementById('syncStatusBlock');
+  const text = document.getElementById('syncStatusText');
+
+  if (!block || !text) return;
+
+  block.hidden = false;
+  text.textContent = message;
+
+  block.dataset.status = type;
 }
 
 function filterAndSortNotes() {
