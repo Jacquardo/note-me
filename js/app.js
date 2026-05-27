@@ -288,24 +288,7 @@ async function loadNotes() {
 
     return state.notes;
   }
-} catch (error) {
-    console.error('Erreur de chargement Google Drive :', error);
-
-    showToast(
-      'Google Drive indisponible. Chargement depuis la copie locale.',
-      'warning',
-      { duration: 5000 }
-    );
-
-    setState({
-      notes: localNotes,
-      filteredNotes: []
-    });
-
-    return state.notes;
-  }
 }
-
 let googleDriveSyncQueue = Promise.resolve();
 
 function persistNotesToGoogleDrive() {
