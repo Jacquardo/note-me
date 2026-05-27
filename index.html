@@ -18,7 +18,7 @@
       media-src 'self' blob:;
       object-src 'none';
       frame-src 'self' blob: https://accounts.google.com;
-      connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com;
+      connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://www.googleapis.com;
       manifest-src 'self';
       worker-src 'self';
       base-uri 'self';
@@ -52,7 +52,7 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 
-<body>
+<body data-google-client-id="180670406711-3t7e475knnbt8lckloot895qqu7hu9s0.apps.googleusercontent.com">
   <a class="skip-link" href="#mainContent">Aller au contenu principal</a>
   
 <!-- ── Écran de connexion Google ─────────────────────────── -->
