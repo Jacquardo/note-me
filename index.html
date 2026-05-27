@@ -78,8 +78,8 @@
     <div id="googleSignInBtn" aria-label="Se connecter avec Google"></div>
 
     <p class="login-privacy">
-      Vos données restent stockées localement.<br>
-      Google n'accède pas à vos notes.
+      Vos notes sont synchronisées dans votre Google Drive privé.<br>
+      L’application utilise uniquement son espace dédié.
     </p>
   </div>
 </div>
@@ -155,6 +155,10 @@
     <div id="userInfoBlock" class="user-info-block" hidden>
       <img id="userAvatar" class="user-avatar" src="" alt="Avatar utilisateur">
       <span id="userDisplayName" class="user-display-name"></span>
+    </div>
+
+    <div id="syncStatusBlock" class="sync-status-block" hidden>
+     <span id="syncStatusText">Non synchronisé</span>
     </div>
       
     </header>
