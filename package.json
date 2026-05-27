@@ -1,7 +1,7 @@
 {
   "name": "notes-me-v11",
   "version": "11.0.0",
-  "description": "Application locale de gestion de notes avec pièces jointes, favoris, corbeille, recherche avancée, export ZIP et PWA.",
+  "description": "Application de gestion de notes avec synchronisation Google Drive, pièces jointes locales, favoris, corbeille, recherche avancée, export ZIP et PWA.",
   "type": "module",
   "private": true,
   "scripts": {
@@ -16,6 +16,7 @@
   },
   "keywords": [
     "notes",
+    "google-drive",
     "indexeddb",
     "pwa",
     "zip",
