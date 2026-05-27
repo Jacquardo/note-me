@@ -77,6 +77,30 @@
   width: 100%;
 }
 
+.sync-status-block {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: var(--text-muted, #b9c4d0);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.sync-status-block[data-status="syncing"] {
+  color: #ffd166;
+}
+
+.sync-status-block[data-status="success"] {
+  color: #7ae582;
+}
+
+.sync-status-block[data-status="error"] {
+  color: #ff6b6b;
+}
+
 /* ── Note de confidentialité ── */
 .login-privacy {
   font-size: 0.75rem;
@@ -122,5 +146,13 @@
 @media (max-width: 600px) {
   .user-display-name {
     display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .sync-status-block {
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
   }
 }
