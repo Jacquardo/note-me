@@ -311,22 +311,6 @@ textarea::placeholder {
   font-weight: 700;
 }
 
-.background-option {
-  display: grid;
-  grid-template-columns: 44px 1fr;
-  gap: 9px;
-  align-items: center;
-  padding: 8px;
-  border-radius: 14px;
-  background: var(--ghost-bg);
-  border: 1px solid var(--ghost-border);
-  color: var(--text-main);
-  text-align: left;
-}
-
-.background-option.active {
-  border-color: var(--accent-b);
-}
 
 .background-thumb {
   width: 44px;
