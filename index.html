@@ -6,25 +6,24 @@
 
   <title>Notes Me V11</title>
 
-  <!-- CSP mise à jour pour autoriser Google Identity Services -->
   <meta
-  http-equiv="Content-Security-Policy"
-  content="
-    default-src 'self';
-    script-src 'self' https://accounts.google.com/gsi/client;
-    style-src 'self' https://fonts.googleapis.com https://accounts.google.com 'unsafe-inline';
-    font-src 'self' https://fonts.gstatic.com;
-    img-src 'self' blob: data: https://*.googleusercontent.com;
-    media-src 'self' blob:;
-    object-src 'none';
-    frame-src 'self' blob: https://accounts.google.com;
-    connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://www.googleapis.com;
-    manifest-src 'self';
-    worker-src 'self';
-    base-uri 'self';
-    form-action 'self';
-  "
->
+    http-equiv="Content-Security-Policy"
+    content="
+      default-src 'self';
+      script-src 'self' https://accounts.google.com;
+      style-src 'self' https://fonts.googleapis.com https://accounts.google.com 'unsafe-inline';
+      font-src 'self' https://fonts.gstatic.com;
+      img-src 'self' blob: data: https://*.googleusercontent.com;
+      media-src 'self' blob:;
+      object-src 'none';
+      frame-src 'self' blob: https://accounts.google.com;
+      connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://www.googleapis.com;
+      manifest-src 'self';
+      worker-src 'self';
+      base-uri 'self';
+      form-action 'self';
+    "
+  >
 
   <meta name="description" content="Notes Me, application de gestion de notes avec synchronisation Google Drive, pièces jointes, favoris, corbeille, recherche avancée, export ZIP et mode hors ligne.">
   <meta name="theme-color" content="#07111f">
@@ -38,16 +37,15 @@
   <link rel="apple-touch-icon" href="./assets/logo.png">
   <link rel="manifest" href="./manifest.webmanifest">
 
-<link rel="stylesheet" href="./css/variables.css">
-<link rel="stylesheet" href="./css/base.css">
-<link rel="stylesheet" href="./css/layout.css">
-<link rel="stylesheet" href="./css/components.css">
-<link rel="stylesheet" href="./css/notes.css">
-<link rel="stylesheet" href="./css/modals.css">
-<link rel="stylesheet" href="./css/auth.css">
-<link rel="stylesheet" href="./css/responsive.css">
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/notes.css">
+  <link rel="stylesheet" href="./css/modals.css">
+  <link rel="stylesheet" href="./css/auth.css">
+  <link rel="stylesheet" href="./css/responsive.css">
 
-  <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client?hl=fr" async defer></script>
 </head>
 
