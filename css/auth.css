@@ -51,13 +51,13 @@
 .login-title {
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--text-primary, #e8f4fd);
+  color: #ffffff; /* blanc */
   margin: 0;
 }
 
 .login-subtitle {
   font-size: 0.9rem;
-  color: var(--text-muted, #7a9ab8);
+  color: #ffffff; /* blanc */
   margin: 0;
   line-height: 1.5;
 }
@@ -84,7 +84,7 @@
   padding: 0.35rem 0.65rem;
   border-radius: 999px;
   font-size: 0.85rem;
-  color: var(--text-muted, #b9c4d0);
+  color: #ffffff; /* blanc */
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
@@ -104,12 +104,12 @@
 /* ── Note de confidentialité ── */
 .login-privacy {
   font-size: 0.75rem;
-  color: var(--text-muted, #7a9ab8);
+  color: #ffffff; /* blanc */
   margin: 0;
 }
 
 .login-privacy a {
-  color: var(--accent, #4da6e8);
+  color: #ffffff; /* lien blanc */
   text-decoration: underline;
 }
 
@@ -135,7 +135,7 @@
 .user-display-name {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--text-primary, #e8f4fd);
+  color: #ffffff; /* blanc */
   max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
