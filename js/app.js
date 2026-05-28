@@ -1055,18 +1055,19 @@ function initBackgroundPicker() {
     button.dataset.background = background.value;
     button.setAttribute('aria-label', `Choisir le fond : ${background.name}`);
 
-    const preview = document.createElement('span');
-    preview.className = 'background-option-preview';
+const preview = document.createElement('span');
+preview.className = 'background-option-preview';
 
-    if (background.value) {
-      preview.style.backgroundImage = `url("${background.value}")`;
-    } else {
-      preview.textContent = 'Aucun';
-    }
+if (background.value) {
+  preview.style.backgroundImage = `url("${background.value}")`;
+} else {
+  preview.textContent = 'Aucun';
+}
 
-    const label = document.createElement('span');
-    label.className = 'background-option-label';
-    label.textContent = background.name;
+const label = document.createElement('span');
+label.className = 'background-option-label';
+label.textContent = background.name;
+    
 
     button.appendChild(preview);
     button.appendChild(label);
