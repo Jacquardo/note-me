@@ -485,6 +485,28 @@ function renderNotesFallback(notes) {
   refs.list.setAttribute('aria-busy', 'false');
 }
 
+function applyNoteBackgroundToElement(element, note) {
+  if (!element || !note) return;
+
+  const backgroundValue = String(note.backgroundImage || '').trim();
+
+  if (!backgroundValue) {
+    element.style.removeProperty('--note-image-url');
+    element.classList.remove('has-background-image');
+    return;
+  }
+
+  const safeValue = backgroundValue.replace(/["\\]/g, '');
+
+  if (safeValue.startsWith('linear-gradient') || safeValue.startsWith('radial-gradient')) {
+    element.style.setProperty('--note-image-url', safeValue);
+  } else {
+    element.style.setProperty('--note-image-url', `url("${safeValue}")`);
+  }
+
+  element.classList.add('has-background-image');
+}
+
 function createNoteElementFallback(note) {
   const item = document.createElement('article');
   item.className = 'item';
@@ -498,22 +520,14 @@ function createNoteElementFallback(note) {
     item.style.setProperty('--note-bg-base', note.color);
   }
 
-  if (note.backgroundImage) {
-    const bgValue = String(note.backgroundImage).trim();
-    const safe = bgValue.replace(/["\\]/g, '');
-
-    // Vérifie si c'est un dégradé CSS (gradient) ou une image
-    if (safe.startsWith('linear-gradient') || safe.startsWith('radial-gradient')) {
-      item.style.setProperty('--note-image-url', safe);
-    } else {
-      // C'est un chemin d'image (ex: ./assets/img1.png)
-      item.style.setProperty('--note-image-url', `url("${safe}")`);
-    }
-  }
+  applyNoteBackgroundToElement(item, note);
 
   if (note.deletedAt) {
     item.classList.add('is-deleted');
   }
+
+  // suite de ta fonction...
+}
 
   const head = document.createElement('div');
   head.className = 'note-head';
@@ -1072,17 +1086,17 @@ label.textContent = background.name;
     button.appendChild(preview);
     button.appendChild(label);
 
-    button.addEventListener('click', () => {
-      setEditorBackground(background.value, background.name);
-      syncEditorDraftFromForm();
-      updatePreview();
+button.addEventListener('click', () => {
+  setEditorBackground(background.value, background.name);
 
-      panel.classList.add('hidden');
+  if (refs.backgroundPickerPanel) {
+    refs.backgroundPickerPanel.classList.add('hidden');
+  }
 
-      if (refs.backgroundToggleBtn) {
-        refs.backgroundToggleBtn.setAttribute('aria-expanded', 'false');
-      }
-    });
+  if (refs.backgroundToggleBtn) {
+    refs.backgroundToggleBtn.setAttribute('aria-expanded', 'false');
+  }
+});
 
     panel.appendChild(button);
   }
@@ -1094,7 +1108,7 @@ label.textContent = background.name;
 }
 
 function setEditorBackground(value = '', label = '') {
-  const normalizedValue = value || '';
+  const normalizedValue = String(value || '').trim();
   const normalizedLabel = label || getBackgroundName(normalizedValue);
 
   if (refs.backgroundImageInput) {
@@ -1105,18 +1119,22 @@ function setEditorBackground(value = '', label = '') {
     refs.activeBackgroundName.textContent = normalizedLabel;
   }
 
+  setEditorDraft({
+    backgroundImage: normalizedValue
+  });
+
   const panel = refs.backgroundPickerPanel || document.getElementById('backgroundPickerPanel');
 
-  if (!panel) {
-    return;
+  if (panel) {
+    for (const button of panel.querySelectorAll('.background-option')) {
+      const isActive = button.dataset.background === normalizedValue;
+
+      button.classList.toggle('active', isActive);
+      button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    }
   }
 
-  for (const button of panel.querySelectorAll('.background-option')) {
-    const isActive = button.dataset.background === normalizedValue;
-
-    button.classList.toggle('active', isActive);
-    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-  }
+  updatePreview();
 }
 
 function getBackgroundName(value = '') {
@@ -1383,24 +1401,24 @@ async function saveCurrentNote() {
       }
     }
 
-    const note = {
-      id: existingNote?.id || generateId(),
-      title: draft.title.trim(),
-      category: draft.category.trim(),
-      tags: parseTags(draft.tags),
-      color: draft.color || DEFAULT_SETTINGS.defaultNoteColor,
-      backgroundImage: draft.backgroundImage || '',
-      favorite: Boolean(draft.favorite),
-      content: draft.content.trim(),
-      fileId: fileId || '',
-      fileName: fileName || '',
-      fileType: fileType || '',
-      fileSize: Number(fileSize || 0),
-      createdAt: existingNote?.createdAt || now,
-      updatedAt: now,
-      deletedAt: existingNote?.deletedAt || null,
-      order: existingNote?.order || now
-    };
+const note = {
+  id: existingNote?.id || generateId(),
+  title: draft.title.trim(),
+  category: draft.category.trim(),
+  tags: parseTags(draft.tags),
+  color: draft.color || DEFAULT_SETTINGS.defaultNoteColor,
+  backgroundImage: draft.backgroundImage || refs.backgroundImageInput?.value || '',
+  favorite: Boolean(draft.favorite),
+  content: draft.content.trim(),
+  fileId: fileId || '',
+  fileName: fileName || '',
+  fileType: fileType || '',
+  fileSize: Number(fileSize || 0),
+  createdAt: existingNote?.createdAt || now,
+  updatedAt: now,
+  deletedAt: existingNote?.deletedAt || null,
+  order: existingNote?.order || now
+};
 
     const notesRepository = state.modules.notesRepository;
 
