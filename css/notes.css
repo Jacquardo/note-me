@@ -55,33 +55,43 @@
   --note-bg-base: #f9e65a;
   --note-text: #111827;
   --note-chip-bg: rgba(255, 255, 255, 0.58);
-  --note-overlay-top: 0.12;
-  --note-overlay-bottom: 0.02;
+  --note-overlay-top: 0.72;
+  --note-overlay-bottom: 0.68;
   --note-image-url: none;
+
+  position: relative;
 
   width: 100%;
   max-width: var(--note-max);
   min-height: var(--note-h);
   height: var(--note-h);
   max-height: var(--note-h);
+
   padding: 16px 16px 60px;
-  border-radius: 18px;
-  position: relative;
-  color: var(--note-text);
+
+  display: flex;
+  flex-direction: column;
+
   overflow: hidden;
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.16);
+  user-select: none;
+  cursor: pointer;
+
+  color: var(--note-text);
+
   border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 18px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.16);
+
   transform: rotate(var(--rot));
+
   transition:
     transform var(--transition-slow),
     box-shadow var(--transition-slow),
     border-color var(--transition-slow);
-  cursor: pointer;
-  user-select: none;
-  display: flex;
-  flex-direction: column;
+
   animation: noteIn 0.28s ease both;
-  background:
+
+  background-image:
     linear-gradient(
       180deg,
       rgba(255, 255, 255, var(--note-overlay-top)),
@@ -94,16 +104,19 @@
       var(--note-bg-base)
     );
 
-  background-image:
-    linear-gradient(
-      rgba(255, 255, 255, 0.72),
-      rgba(255, 255, 255, 0.72)
-    ),
-    var(--note-image-url, none);
-  
   background-size: cover, cover, cover;
   background-position: center, center, center;
   background-repeat: no-repeat, no-repeat, no-repeat;
+}
+
+html[data-theme="dark"] .item {
+  --note-overlay-top: 0.64;
+  --note-overlay-bottom: 0.58;
+}
+
+html[data-theme="light"] .item {
+  --note-overlay-top: 0.74;
+  --note-overlay-bottom: 0.68;
 }
 
 .item::after {
