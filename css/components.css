@@ -508,3 +508,94 @@ textarea::placeholder {
   font-size: 20px;
   line-height: 1;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Sélecteur de fonds de note
+───────────────────────────────────────────────────────────── */
+
+.background-picker {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.background-picker-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 0.65rem;
+
+  padding: 0.75rem;
+
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 1rem;
+
+  background: var(--surface-muted, rgba(255, 255, 255, 0.06));
+}
+
+.background-picker-panel.hidden {
+  display: none;
+}
+
+.background-option {
+  display: grid;
+  gap: 0.4rem;
+
+  min-height: 92px;
+  padding: 0.45rem;
+
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border-radius: 0.85rem;
+
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.06);
+
+  cursor: pointer;
+}
+
+.background-option:hover {
+  border-color: var(--accent-a, #4fc7ff);
+}
+
+.background-option.active {
+  border-color: var(--accent-a, #4fc7ff);
+  box-shadow: 0 0 0 3px rgba(79, 199, 255, 0.18);
+}
+
+.background-option-preview {
+  min-height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 0.65rem;
+
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+
+  background-color: rgba(255, 255, 255, 0.08);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.background-option-empty .background-option-preview {
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+}
+
+.background-option-label {
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.active-background-name {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
