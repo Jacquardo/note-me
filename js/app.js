@@ -32,6 +32,21 @@ import {
   clearGoogleDriveSession
 } from './google-drive-sync.js';
 
+const NOTE_BACKGROUNDS = [
+  {
+    name: 'Aucun fond',
+    value: ''
+  },
+  ...Array.from({ length: 10 }, (_, index) => {
+    const number = index + 1;
+
+    return {
+      name: `Fond ${number}`,
+      value: `./assets/img${number}.png`
+    };
+  })
+];
+
 document.addEventListener('DOMContentLoaded', init);
 
 window.addEventListener('beforeunload', () => {
@@ -843,7 +858,9 @@ function bindEditor() {
       syncEditorDraftFromForm();
     });
   }
-
+  
+initBackgroundPicker();
+  
   refs.backgroundToggleBtn?.addEventListener('click', () => {
     if (!refs.backgroundPickerPanel) return;
 
@@ -1017,6 +1034,104 @@ function handleInitialUrlActions() {
   }
 }
 
+function initBackgroundPicker() {
+  const panel = refs.backgroundPickerPanel || document.getElementById('backgroundPickerPanel');
+
+  if (!panel || panel.dataset.bound === 'true') {
+    return;
+  }
+
+  panel.dataset.bound = 'true';
+  panel.replaceChildren();
+
+  for (const background of NOTE_BACKGROUNDS) {
+    const button = document.createElement('button');
+
+    button.type = 'button';
+    button.className = background.value
+      ? 'background-option'
+      : 'background-option background-option-empty';
+
+    button.dataset.background = background.value;
+    button.setAttribute('aria-label', `Choisir le fond : ${background.name}`);
+
+    const preview = document.createElement('span');
+    preview.className = 'background-option-preview';
+
+    if (background.value) {
+      preview.style.backgroundImage = `url("${background.value}")`;
+    } else {
+      preview.textContent = 'Aucun';
+    }
+
+    const label = document.createElement('span');
+    label.className = 'background-option-label';
+    label.textContent = background.name;
+
+    button.appendChild(preview);
+    button.appendChild(label);
+
+    button.addEventListener('click', () => {
+      setEditorBackground(background.value, background.name);
+      syncEditorDraftFromForm();
+      updatePreview();
+
+      panel.classList.add('hidden');
+
+      if (refs.backgroundToggleBtn) {
+        refs.backgroundToggleBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    panel.appendChild(button);
+  }
+
+  setEditorBackground(
+    refs.backgroundImageInput?.value || '',
+    getBackgroundName(refs.backgroundImageInput?.value || '')
+  );
+}
+
+function setEditorBackground(value = '', label = '') {
+  const normalizedValue = value || '';
+  const normalizedLabel = label || getBackgroundName(normalizedValue);
+
+  if (refs.backgroundImageInput) {
+    refs.backgroundImageInput.value = normalizedValue;
+  }
+
+  if (refs.activeBackgroundName) {
+    refs.activeBackgroundName.textContent = normalizedLabel;
+  }
+
+  const panel = refs.backgroundPickerPanel || document.getElementById('backgroundPickerPanel');
+
+  if (!panel) {
+    return;
+  }
+
+  for (const button of panel.querySelectorAll('.background-option')) {
+    const isActive = button.dataset.background === normalizedValue;
+
+    button.classList.toggle('active', isActive);
+    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  }
+}
+
+function getBackgroundName(value = '') {
+  if (!value) {
+    return 'Aucun fond';
+  }
+
+  const match = String(value).match(/img(\d+)\.png$/i);
+
+  if (match) {
+    return `Fond ${match[1]}`;
+  }
+
+  return 'Fond personnalisé';
+}
+
 function openEditor(note = null) {
   resetEditorDraft();
 
@@ -1074,8 +1189,8 @@ function syncEditorFormFromDraft() {
   if (refs.categoryInput) refs.categoryInput.value = draft.category || '';
   if (refs.tagsInput) refs.tagsInput.value = draft.tags || '';
   if (refs.contentInput) refs.contentInput.value = draft.content || '';
-  if (refs.backgroundImageInput) refs.backgroundImageInput.value = draft.backgroundImage || '';
-  if (refs.activeBackgroundName) refs.activeBackgroundName.textContent = draft.backgroundImage ? 'Fond personnalisé' : 'Aucun fond';
+  
+  setEditorBackground(draft.backgroundImage || '');
 
   setEditorColor(draft.color || DEFAULT_SETTINGS.defaultNoteColor);
   setFavoriteInEditor(Boolean(draft.favorite));
