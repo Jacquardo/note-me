@@ -93,6 +93,14 @@
       var(--note-bg-light),
       var(--note-bg-base)
     );
+  
+    background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 0.72),
+      rgba(255, 255, 255, 0.72)
+    ),
+    var(--note-image-url, none);
+
   background-size: cover, cover, cover;
   background-position: center, center, center;
   background-repeat: no-repeat, no-repeat, no-repeat;
