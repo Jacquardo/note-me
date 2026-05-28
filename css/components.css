@@ -303,37 +303,12 @@ textarea::placeholder {
   border: 1px solid rgba(0, 0, 0, 0.14);
 }
 
-.background-picker {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-  margin-top: 14px;
-}
+
 
 .active-background-name {
   color: var(--text-muted);
   font-size: 13px;
   font-weight: 700;
-}
-
-.background-picker-panel {
-  position: absolute;
-  top: calc(100% + 10px);
-  left: 0;
-  z-index: calc(var(--menu-z) + 2);
-  display: grid;
-  grid-template-columns: repeat(2, minmax(120px, 1fr));
-  gap: 8px;
-  width: min(360px, calc(100vw - 48px));
-  max-height: 300px;
-  overflow: auto;
-  padding: 10px;
-  border-radius: 18px;
-  background: var(--panel-bg-solid);
-  border: 1px solid var(--panel-border);
-  box-shadow: var(--shadow-lg);
 }
 
 .background-option {
