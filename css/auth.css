@@ -51,13 +51,13 @@
 .login-title {
   font-size: 1.6rem;
   font-weight: 700;
-  color: #fff !important;
+  color: #ffffff; /* blanc */
   margin: 0;
 }
 
 .login-subtitle {
   font-size: 0.9rem;
-  color: #fff !important;
+  color: #ffffff; /* blanc */
   margin: 0;
   line-height: 1.5;
 }
@@ -84,7 +84,7 @@
   padding: 0.35rem 0.65rem;
   border-radius: 999px;
   font-size: 0.85rem;
-  color: #fff !important;
+  color: #ffffff; /* blanc */
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
