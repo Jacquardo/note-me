@@ -15,6 +15,8 @@
   justify-content: center;
 
   padding: 1rem;
+  overflow-y: auto;
+
   background: var(--bg-primary, #07111f);
 
   animation: fadeInOverlay 0.3s ease;
@@ -76,6 +78,7 @@
 .login-logo {
   width: 72px;
   height: 72px;
+
   object-fit: contain;
   border-radius: 1rem;
 }
@@ -121,6 +124,15 @@
   max-width: 100%;
 }
 
+/* Message de secours si le bouton Google ne peut pas être rendu */
+.google-signin-fallback {
+  margin: 0;
+
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #ffd166;
+}
+
 /* ─────────────────────────────────────────────────────────────
    Confidentialité
 ───────────────────────────────────────────────────────────── */
@@ -145,13 +157,17 @@
 .sync-status-block {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
 
+  min-height: 34px;
   padding: 0.35rem 0.65rem;
+
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 999px;
 
   font-size: 0.85rem;
+  line-height: 1.25;
   color: var(--text-muted, #b9c4d0);
 
   background: rgba(255, 255, 255, 0.08);
@@ -182,7 +198,9 @@
   align-items: center;
   gap: 0.6rem;
 
+  min-height: 40px;
   padding: 0.25rem 0.5rem;
+
   border: 1px solid var(--border, #1e3a5f);
   border-radius: 2rem;
 
@@ -196,6 +214,8 @@
 .user-avatar {
   width: 32px;
   height: 32px;
+
+  flex: 0 0 auto;
 
   object-fit: cover;
   border: 2px solid var(--accent, #4da6e8);
@@ -215,10 +235,16 @@
 }
 
 /* ─────────────────────────────────────────────────────────────
-   Responsive
+   Responsive login
 ───────────────────────────────────────────────────────────── */
 
 @media (max-width: 720px) {
+  .login-overlay {
+    min-height: 100dvh;
+    align-items: center;
+    padding: 1rem;
+  }
+
   .login-card {
     width: min(360px, 94vw);
     padding: 2rem 1.4rem;
@@ -234,10 +260,14 @@
     font-size: 1.45rem;
   }
 
+  .login-subtitle {
+    font-size: 0.88rem;
+  }
+
   .sync-status-block {
     width: 100%;
-    justify-content: center;
     margin-top: 0.5rem;
+    text-align: center;
   }
 }
 
@@ -250,6 +280,10 @@
 @media (max-width: 380px) {
   .login-card {
     padding: 1.7rem 1rem;
+  }
+
+  .login-title {
+    font-size: 1.32rem;
   }
 
   .login-subtitle {
