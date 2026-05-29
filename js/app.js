@@ -47,6 +47,13 @@ const NOTE_BACKGROUNDS = [
   })
 ];
 
+const CONTINUOUS_SYNC_INTERVAL_MS = 45 * 1000;
+
+let continuousSyncTimer = null;
+let continuousSyncStarted = false;
+let isPullingFromGoogleDrive = false;
+
+
 document.addEventListener('DOMContentLoaded', init);
 
 window.addEventListener('beforeunload', () => {
@@ -79,11 +86,14 @@ async function init() {
     await initDatabase();
     await restoreSettings();
     bindApplicationUi();
-    await loadNotes();
-    await renderApp();
-    setState({ isReady: true, isLoading: false });
-    showToast(`Notes Me V${APP_VERSION} est prêt.`, 'success', { duration: 1800 });
-    handleInitialUrlActions();
+await loadNotes();
+await renderApp();
+
+startContinuousSync();
+
+setState({ isReady: true, isLoading: false });
+showToast(`Notes Me V${APP_VERSION} est prêt.`, 'success', { duration: 1800 });
+handleInitialUrlActions();
   } catch (error) {
     console.error('Erreur critique au démarrage :', error);
     setState({ isLoading: false });
@@ -123,10 +133,12 @@ function bindLogout() {
 
     if (!confirmed) return;
 
-    clearGoogleDriveSession();
-    signOut();
+    stopContinuousSync();
 
-    showToast('Vous avez été déconnecté.', 'info');
+clearGoogleDriveSession();
+signOut();
+
+showToast('Vous avez été déconnecté.', 'info');
   });
 }
 
@@ -330,6 +342,211 @@ function persistNotesToGoogleDrive() {
     });
 
   return googleDriveSyncQueue;
+}
+
+
+function startContinuousSync() {
+  if (continuousSyncStarted) {
+    return;
+  }
+
+  continuousSyncStarted = true;
+
+  continuousSyncTimer = window.setInterval(() => {
+    if (document.hidden) return;
+    if (navigator.onLine === false) return;
+
+    syncFromGoogleDrive({
+      silent: true
+    });
+  }, CONTINUOUS_SYNC_INTERVAL_MS);
+
+  window.addEventListener('online', handleOnlineSync);
+  window.addEventListener('focus', handleFocusSync);
+  document.addEventListener('visibilitychange', handleVisibilitySync);
+}
+
+function stopContinuousSync() {
+  continuousSyncStarted = false;
+
+  if (continuousSyncTimer) {
+    window.clearInterval(continuousSyncTimer);
+    continuousSyncTimer = null;
+  }
+
+  window.removeEventListener('online', handleOnlineSync);
+  window.removeEventListener('focus', handleFocusSync);
+  document.removeEventListener('visibilitychange', handleVisibilitySync);
+}
+
+function handleOnlineSync() {
+  syncFromGoogleDrive({
+    silent: false
+  });
+}
+
+function handleFocusSync() {
+  syncFromGoogleDrive({
+    silent: true
+  });
+}
+
+function handleVisibilitySync() {
+  if (!document.hidden) {
+    syncFromGoogleDrive({
+      silent: true
+    });
+  }
+}
+
+async function syncFromGoogleDrive({ silent = false } = {}) {
+  if (isPullingFromGoogleDrive) {
+    return;
+  }
+
+  if (state.isSaving) {
+    return;
+  }
+
+  if (refs.editorModal?.classList.contains('open')) {
+    return;
+  }
+
+  if (navigator.onLine === false) {
+    setSyncStatus('Mode hors ligne', 'error');
+    return;
+  }
+
+  isPullingFromGoogleDrive = true;
+
+  try {
+    if (!silent) {
+      showToast('Synchronisation Google Drive...', 'info', { duration: 1400 });
+    }
+
+    setSyncStatus('Synchronisation Google Drive...', 'syncing');
+
+    const remoteNotes = await loadNotesFromGoogleDrive();
+    const safeRemoteNotes = Array.isArray(remoteNotes) ? remoteNotes : [];
+    const safeLocalNotes = Array.isArray(state.notes) ? state.notes : [];
+
+    const mergedNotes = mergeNotesByUpdatedAt(safeLocalNotes, safeRemoteNotes);
+
+    const localChanged = !areNotesEquivalent(safeLocalNotes, mergedNotes);
+    const remoteChanged = !areNotesEquivalent(safeRemoteNotes, mergedNotes);
+
+    if (localChanged) {
+      setState({
+        notes: mergedNotes,
+        filteredNotes: []
+      });
+
+      await cacheNotesLocally(mergedNotes);
+
+      resetPagination();
+      await renderApp();
+    }
+
+    if (remoteChanged) {
+      await saveNotesToGoogleDrive(mergedNotes);
+    }
+
+    setSyncStatus('Synchronisé avec Google Drive', 'success');
+  } catch (error) {
+    console.error('Erreur synchronisation continue Google Drive :', error);
+
+    setSyncStatus('Erreur de synchronisation', 'error');
+
+    if (!silent) {
+      showToast(
+        'Impossible de synchroniser avec Google Drive pour le moment.',
+        'warning',
+        { duration: 5000 }
+      );
+    }
+  } finally {
+    isPullingFromGoogleDrive = false;
+  }
+}
+
+function mergeNotesByUpdatedAt(localNotes = [], remoteNotes = []) {
+  const notesMap = new Map();
+
+  for (const note of remoteNotes) {
+    if (!note?.id) continue;
+
+    notesMap.set(note.id, note);
+  }
+
+  for (const localNote of localNotes) {
+    if (!localNote?.id) continue;
+
+    const remoteNote = notesMap.get(localNote.id);
+
+    if (!remoteNote) {
+      notesMap.set(localNote.id, localNote);
+      continue;
+    }
+
+    const localTime = getNoteSyncTimestamp(localNote);
+    const remoteTime = getNoteSyncTimestamp(remoteNote);
+
+    if (localTime >= remoteTime) {
+      notesMap.set(localNote.id, localNote);
+    }
+  }
+
+  return Array.from(notesMap.values()).sort((a, b) => {
+    const dateA = Number(a.updatedAt || a.createdAt || 0);
+    const dateB = Number(b.updatedAt || b.createdAt || 0);
+
+    return dateB - dateA;
+  });
+}
+
+function getNoteSyncTimestamp(note) {
+  return Number(note.updatedAt || note.deletedAt || note.createdAt || 0);
+}
+
+function areNotesEquivalent(a = [], b = []) {
+  return getNotesSignature(a) === getNotesSignature(b);
+}
+
+function getNotesSignature(notes = []) {
+  return JSON.stringify(
+    [...notes]
+      .map((note) => ({
+        id: note.id,
+        title: note.title || '',
+        category: note.category || '',
+        tags: Array.isArray(note.tags) ? note.tags : [],
+        color: note.color || '',
+        backgroundImage: note.backgroundImage || '',
+        favorite: Boolean(note.favorite),
+        content: note.content || '',
+        fileId: note.fileId || '',
+        fileName: note.fileName || '',
+        fileType: note.fileType || '',
+        fileSize: Number(note.fileSize || 0),
+        createdAt: Number(note.createdAt || 0),
+        updatedAt: Number(note.updatedAt || 0),
+        deletedAt: note.deletedAt || null,
+        order: Number(note.order || 0)
+      }))
+      .sort((noteA, noteB) => String(noteA.id).localeCompare(String(noteB.id)))
+  );
+}
+
+async function cacheNotesLocally(notes = []) {
+  const notesRepository = state.modules.notesRepository;
+
+  if (!notesRepository || typeof notesRepository.saveNoteToDB !== 'function') {
+    return;
+  }
+
+  for (const note of notes) {
+    await notesRepository.saveNoteToDB(note);
+  }
 }
 
 async function renderApp() {
