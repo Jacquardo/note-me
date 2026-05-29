@@ -52,6 +52,7 @@ const CONTINUOUS_SYNC_INTERVAL_MS = 45 * 1000;
 let continuousSyncTimer = null;
 let continuousSyncStarted = false;
 let isPullingFromGoogleDrive = false;
+let activeConfirmationPromise = null;
 let isPushingToGoogleDrive = false;
 let isGoogleDriveSyncAvailable = false;
 let authLifecycleBound = false;
@@ -134,7 +135,19 @@ function bindLogout() {
 
   logoutBtn.dataset.bound = 'true';
 
-  logoutBtn.addEventListener('click', async () => {
+function bindLogout() {
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  if (!logoutBtn || logoutBtn.dataset.bound === 'true') return;
+
+  logoutBtn.dataset.bound = 'true';
+
+  logoutBtn.addEventListener('click', async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    setMenuOpen(false);
+
     const confirmed = await askConfirmation(
       'Se déconnecter',
       'Vous allez être déconnecté de Notes Me. Vos données locales restent intactes.'
@@ -866,9 +879,11 @@ function createNoteElementFallback(note) {
   favoriteBtn.setAttribute('aria-pressed', note.favorite ? 'true' : 'false');
 
   favoriteBtn.addEventListener('click', (event) => {
-    event.stopPropagation();
-    toggleFavorite(note.id);
-  });
+  event.preventDefault();
+  event.stopPropagation();
+
+  toggleFavorite(note.id);
+});
 
   headActions.appendChild(favoriteBtn);
   head.appendChild(title);
@@ -908,9 +923,11 @@ function createNoteElementFallback(note) {
     const restoreBtn = createActionButton('Restaurer', '↩');
 
     restoreBtn.addEventListener('click', (event) => {
-      event.stopPropagation();
-      restoreNote(note.id);
-    });
+  event.preventDefault();
+  event.stopPropagation();
+
+  restoreNote(note.id);
+});
 
     actions.appendChild(restoreBtn);
   } else {
@@ -924,9 +941,11 @@ function createNoteElementFallback(note) {
     const deleteBtn = createActionButton('Supprimer', '🗑️', true);
 
     deleteBtn.addEventListener('click', (event) => {
-      event.stopPropagation();
-      deleteNote(note.id);
-    });
+  event.preventDefault();
+  event.stopPropagation();
+
+  deleteNote(note.id);
+});
 
     actions.appendChild(editBtn);
     actions.appendChild(deleteBtn);
@@ -1848,10 +1867,12 @@ function openNote(noteId) {
   editBtn.className = 'btn btn-secondary';
   editBtn.type = 'button';
   editBtn.textContent = '✏️ Modifier';
-  editBtn.addEventListener('click', () => {
-    closeNoteModal();
-    editNote(note.id);
-  });
+  editBtn.addEventListener('click', (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  editNote(note.id);
+});
 
   actions.appendChild(editBtn);
 
@@ -2194,10 +2215,14 @@ function openModal(modal, focusTarget = null) {
   state.lastFocusedElement = document.activeElement;
 
   modal.classList.add('open');
+  modal.removeAttribute('hidden');
   modal.setAttribute('aria-hidden', 'false');
+
   document.body.classList.add('modal-open');
 
-  const target = focusTarget || modal.querySelector('button, input, textarea, select, [tabindex]:not([tabindex="-1"])');
+  const target =
+    focusTarget ||
+    modal.querySelector('button, input, textarea, select, [tabindex]:not([tabindex="-1"])');
 
   requestAnimationFrame(() => {
     target?.focus();
@@ -2214,12 +2239,16 @@ function closeModal(modal) {
     document.body.classList.remove('modal-open');
   }
 
-  if (state.lastFocusedElement && typeof state.lastFocusedElement.focus === 'function') {
+  if (
+    state.lastFocusedElement &&
+    typeof state.lastFocusedElement.focus === 'function' &&
+    document.contains(state.lastFocusedElement)
+  ) {
     state.lastFocusedElement.focus();
-    state.lastFocusedElement = null;
   }
-}
 
+  state.lastFocusedElement = null;
+}
 function closeTopMostModal() {
   const openModals = Array.from(document.querySelectorAll('.modal.open'));
 
@@ -2233,35 +2262,101 @@ async function askConfirmation(title, message) {
     return true;
   }
 
-  if (!refs.confirmModal) {
-    return window.confirm(message);
+  if (
+    !refs.confirmModal ||
+    !refs.confirmTitle ||
+    !refs.confirmMessage ||
+    !refs.confirmOkBtn ||
+    !refs.confirmCancelBtn
+  ) {
+    return window.confirm(message || 'Êtes-vous sûr ?');
   }
 
-  return new Promise((resolve) => {
-    refs.confirmTitle.textContent = title || 'Confirmation';
-    refs.confirmMessage.textContent = message || 'Êtes-vous sûr ?';
+  if (activeConfirmationPromise) {
+    return activeConfirmationPromise;
+  }
 
-    const cleanup = () => {
-      refs.confirmOkBtn.removeEventListener('click', onConfirm);
-      refs.confirmCancelBtn.removeEventListener('click', onCancel);
-      closeModal(refs.confirmModal);
+  setMenuOpen(false);
+
+  activeConfirmationPromise = new Promise((resolve) => {
+    const modal = refs.confirmModal;
+    const confirmTitle = refs.confirmTitle;
+    const confirmMessage = refs.confirmMessage;
+    const okButton = refs.confirmOkBtn;
+    const cancelButton = refs.confirmCancelBtn;
+
+    let resolved = false;
+
+    const finish = (value) => {
+      if (resolved) return;
+
+      resolved = true;
+
+      okButton.removeEventListener('click', onConfirm);
+      cancelButton.removeEventListener('click', onCancel);
+      modal.removeEventListener('click', onBackdropClick, true);
+      document.removeEventListener('keydown', onKeyDown, true);
+
+      closeModal(modal);
+
+      activeConfirmationPromise = null;
+
+      resolve(value);
     };
 
-    const onConfirm = () => {
-      cleanup();
-      resolve(true);
+    const onConfirm = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      finish(true);
     };
 
-    const onCancel = () => {
-      cleanup();
-      resolve(false);
+    const onCancel = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      finish(false);
     };
 
-    refs.confirmOkBtn.addEventListener('click', onConfirm);
-    refs.confirmCancelBtn.addEventListener('click', onCancel);
+    const onBackdropClick = (event) => {
+      if (event.target !== modal) return;
 
-    openModal(refs.confirmModal, refs.confirmCancelBtn);
+      event.preventDefault();
+      event.stopPropagation();
+
+      finish(false);
+    };
+
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopPropagation();
+
+        finish(false);
+      }
+    };
+
+    confirmTitle.textContent = title || 'Confirmation';
+    confirmMessage.textContent = message || 'Êtes-vous sûr ?';
+
+    okButton.addEventListener('click', onConfirm);
+    cancelButton.addEventListener('click', onCancel);
+    modal.addEventListener('click', onBackdropClick, true);
+    document.addEventListener('keydown', onKeyDown, true);
+
+    /*
+      Important :
+      on ouvre la modale à la frame suivante pour éviter les conflits
+      avec le clic qui vient de déclencher l’action.
+    */
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        openModal(modal, cancelButton);
+      });
+    });
   });
+
+  return activeConfirmationPromise;
 }
 
 function loadMoreNotes() {
