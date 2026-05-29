@@ -57,6 +57,7 @@ export async function renderNotes({
     }
 
     container.setAttribute('aria-busy', 'false');
+
     return;
   }
 
@@ -205,7 +206,6 @@ export function createNoteCard({
 
   item.addEventListener('keydown', (event) => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
-
     if (isInteractiveElement(event.target)) return;
 
     event.preventDefault();
@@ -248,7 +248,6 @@ function createNoteHead(note, onToggleFavorite) {
   favoriteButton.setAttribute('aria-pressed', note.favorite ? 'true' : 'false');
 
   actions.appendChild(favoriteButton);
-
   head.appendChild(title);
   head.appendChild(actions);
 
@@ -272,7 +271,7 @@ function createNoteBadges(note) {
     badges.appendChild(createBadge(`#${tag}`));
   }
 
-  if (note.fileId) {
+  if (note.fileId || note.fileName) {
     badges.appendChild(createBadge(getFileBadgeText(note)));
   }
 
@@ -381,20 +380,14 @@ function applyNoteStyle(item, note) {
   item.style.setProperty('--note-bg-light', color);
   item.style.setProperty('--note-bg-base', color);
 
-  if (note.backgroundImage) {
-  try {
-    const abs = new URL(String(note.backgroundImage), window.location.href).href;
-    item.style.setProperty('--note-image-url', `url("${cssEscapeUrl(abs)}")`);
-  } catch (err) {
-    // fallback si la valeur n'est pas un chemin relatif/valide
-    item.style.setProperty('--note-image-url', `url("${cssEscapeUrl(note.backgroundImage)}")`);
-  }
-}
+  applyNoteBackgroundToElement(item, note);
 
   const rotation = getStableRotation(note.id);
+
   item.style.setProperty('--rot', `${rotation}deg`);
 
   const textColor = getReadableTextColor(color);
+
   item.style.setProperty('--note-text', textColor);
 
   if (textColor === '#ffffff') {
@@ -402,6 +395,29 @@ function applyNoteStyle(item, note) {
   } else {
     item.style.setProperty('--note-chip-bg', 'rgba(255, 255, 255, 0.58)');
   }
+}
+
+function applyNoteBackgroundToElement(item, note) {
+  const backgroundValue = String(note.backgroundImage || '').trim();
+
+  if (!backgroundValue) {
+    item.style.removeProperty('--note-image-url');
+    item.classList.remove('has-background-image');
+    return;
+  }
+
+  const safeValue = cssEscapeUrl(backgroundValue);
+
+  if (
+    safeValue.startsWith('linear-gradient') ||
+    safeValue.startsWith('radial-gradient')
+  ) {
+    item.style.setProperty('--note-image-url', safeValue);
+  } else {
+    item.style.setProperty('--note-image-url', `url("${safeValue}")`);
+  }
+
+  item.classList.add('has-background-image');
 }
 
 function getSafeRenderLimit(state) {
