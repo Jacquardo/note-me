@@ -509,6 +509,7 @@ function applyNoteBackgroundToElement(element, note) {
 
 function createNoteElementFallback(note) {
   const item = document.createElement('article');
+
   item.className = 'item';
   item.tabIndex = 0;
   item.dataset.noteId = note.id;
@@ -525,9 +526,6 @@ function createNoteElementFallback(note) {
   if (note.deletedAt) {
     item.classList.add('is-deleted');
   }
-
-  // suite de ta fonction...
-}
 
   const head = document.createElement('div');
   head.className = 'note-head';
@@ -566,8 +564,12 @@ function createNoteElementFallback(note) {
     badges.appendChild(createBadge(`#${tag}`));
   }
 
-  if (note.fileId) {
-    badges.appendChild(createBadge('📎 Fichier'));
+  if (note.fileId || note.fileName) {
+    badges.appendChild(createBadge(note.fileName ? `📎 ${note.fileName}` : '📎 Fichier'));
+  }
+
+  if (note.deletedAt) {
+    badges.appendChild(createBadge('🗑️ Corbeille'));
   }
 
   const content = document.createElement('p');
@@ -583,6 +585,7 @@ function createNoteElementFallback(note) {
 
   if (note.deletedAt) {
     const restoreBtn = createActionButton('Restaurer', '↩');
+
     restoreBtn.addEventListener('click', (event) => {
       event.stopPropagation();
       restoreNote(note.id);
@@ -591,12 +594,14 @@ function createNoteElementFallback(note) {
     actions.appendChild(restoreBtn);
   } else {
     const editBtn = createActionButton('Modifier', '✏️');
+
     editBtn.addEventListener('click', (event) => {
       event.stopPropagation();
       editNote(note.id);
     });
 
     const deleteBtn = createActionButton('Supprimer', '🗑️', true);
+
     deleteBtn.addEventListener('click', (event) => {
       event.stopPropagation();
       deleteNote(note.id);
@@ -623,6 +628,7 @@ function createNoteElementFallback(note) {
 
   return item;
 }
+
 
 function createBadge(text) {
   const badge = document.createElement('span');
