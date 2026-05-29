@@ -183,6 +183,12 @@ function _handleCredentialResponse(response) {
   _hideLoginOverlay();
   _updateUserUI(currentUser);
 
+  window.dispatchEvent(
+  new CustomEvent('notes-me-authenticated', {
+    detail: currentUser
+  })
+);
+  
   if (pendingAuthResolve) {
     pendingAuthResolve(currentUser);
     pendingAuthResolve = null;
@@ -262,6 +268,8 @@ export function signOut() {
 
   _updateUserUI(null);
   _showLoginOverlay();
+
+  window.dispatchEvent(new CustomEvent('notes-me-signed-out'));
 
   try {
     _setupGoogleSignIn();
