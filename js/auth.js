@@ -1,7 +1,7 @@
 // js/auth.js
 
 // ─────────────────────────────────────────────────────────
-// Gestion de l'authentification Google avec Google Identity Services
+// Authentification Google avec Google Identity Services
 // Ce module sert à identifier l'utilisateur.
 // Il ne donne pas accès à Google Drive.
 // Pour Google Drive, il faut utiliser google.accounts.oauth2 séparément.
@@ -24,21 +24,30 @@ let pendingAuthReject = null;
  */
 export async function initAuth() {
   try {
-    await _waitForGoogleIdentityServices();
-    _setupGoogleSignIn();
+    await waitForGoogleIdentityServices();
 
-    const storedUser = _loadStoredUser();
+    setupGoogleSignIn();
+
+    const storedUser = loadStoredUser();
 
     if (storedUser) {
       currentUser = storedUser;
 
-      _hideLoginOverlay();
-      _updateUserUI(currentUser);
+      hideLoginOverlay();
+      updateUserUI(currentUser);
+      setAppAccessibilityState(true);
+
+      window.dispatchEvent(
+        new CustomEvent('notes-me-authenticated', {
+          detail: currentUser
+        })
+      );
 
       return currentUser;
     }
 
-    _showLoginOverlay();
+    showLoginOverlay();
+    setAppAccessibilityState(false);
 
     return new Promise((resolve, reject) => {
       pendingAuthResolve = resolve;
@@ -46,7 +55,10 @@ export async function initAuth() {
     });
   } catch (error) {
     console.error('Erreur initialisation Google Sign-In :', error);
-    _showLoginOverlay();
+
+    showLoginOverlay();
+    setAppAccessibilityState(false);
+
     throw error;
   }
 }
@@ -55,12 +67,13 @@ export async function initAuth() {
 // Configuration Google Sign-In
 // ─────────────────────────────────────────────────────────
 
-function _setupGoogleSignIn() {
+function setupGoogleSignIn() {
   if (googleInitialized) {
+    renderGoogleButton();
     return;
   }
 
-  const clientId = _getClientId();
+  const clientId = getClientId();
 
   if (!clientId) {
     throw new Error('Client ID Google manquant.');
@@ -72,38 +85,70 @@ function _setupGoogleSignIn() {
 
   google.accounts.id.initialize({
     client_id: clientId,
-    callback: _handleCredentialResponse,
+    callback: handleCredentialResponse,
     auto_select: false,
     cancel_on_tap_outside: false,
     ux_mode: 'popup'
   });
 
+  googleInitialized = true;
+
+  renderGoogleButton();
+  promptOneTap();
+}
+
+function renderGoogleButton() {
   const buttonContainer = document.getElementById('googleSignInBtn');
 
-  if (buttonContainer) {
-    buttonContainer.replaceChildren();
+  if (!buttonContainer) {
+    return;
+  }
 
+  buttonContainer.replaceChildren();
+
+  try {
     google.accounts.id.renderButton(buttonContainer, {
       theme: 'outline',
       size: 'large',
       text: 'signin_with',
       shape: 'rectangular',
-      width: 280,
+      width: Math.min(280, Math.max(220, buttonContainer.clientWidth || 280)),
       locale: 'fr',
       ux_mode: 'popup'
     });
+
+    window.setTimeout(() => {
+      const hasContent = buttonContainer.children.length > 0;
+
+      if (!hasContent) {
+        showGoogleButtonFallback(buttonContainer);
+      }
+    }, 1500);
+  } catch (error) {
+    console.error('Impossible de rendre le bouton Google :', error);
+    showGoogleButtonFallback(buttonContainer);
   }
+}
 
-  googleInitialized = true;
+function showGoogleButtonFallback(container) {
+  container.replaceChildren();
 
+  const message = document.createElement('p');
+  message.className = 'google-signin-fallback';
+  message.textContent = 'Connexion Google indisponible. Ouvrez cette page dans Chrome et vérifiez que JavaScript est autorisé.';
+
+  container.appendChild(message);
+}
+
+function promptOneTap() {
   try {
     google.accounts.id.prompt((notification) => {
       if (notification.isNotDisplayed?.() || notification.isSkippedMoment?.()) {
         console.info(
           'One Tap non disponible :',
           notification.getNotDisplayedReason?.() ||
-          notification.getSkippedReason?.() ||
-          'raison inconnue'
+            notification.getSkippedReason?.() ||
+            'raison inconnue'
         );
       }
     });
@@ -112,26 +157,26 @@ function _setupGoogleSignIn() {
   }
 }
 
-function _getClientId() {
+function getClientId() {
   return document.body?.dataset?.googleClientId || FALLBACK_CLIENT_ID;
 }
 
-function _waitForGoogleIdentityServices() {
+function waitForGoogleIdentityServices() {
   return new Promise((resolve, reject) => {
     let attempts = 0;
     const maxAttempts = 100;
 
-    const timer = setInterval(() => {
+    const timer = window.setInterval(() => {
       attempts += 1;
 
       if (window.google?.accounts?.id) {
-        clearInterval(timer);
+        window.clearInterval(timer);
         resolve();
         return;
       }
 
       if (attempts >= maxAttempts) {
-        clearInterval(timer);
+        window.clearInterval(timer);
         reject(new Error('Google Identity Services non chargé.'));
       }
     }, 100);
@@ -142,30 +187,16 @@ function _waitForGoogleIdentityServices() {
 // Traitement de la réponse Google
 // ─────────────────────────────────────────────────────────
 
-function _handleCredentialResponse(response) {
+function handleCredentialResponse(response) {
   if (!response?.credential) {
-    const error = new Error('Réponse Google invalide.');
-
-    if (pendingAuthReject) {
-      pendingAuthReject(error);
-      pendingAuthReject = null;
-      pendingAuthResolve = null;
-    }
-
+    rejectPendingAuth(new Error('Réponse Google invalide.'));
     return;
   }
 
-  const decoded = _parseJwt(response.credential);
+  const decoded = parseJwt(response.credential);
 
   if (!decoded?.sub) {
-    const error = new Error('Token Google invalide.');
-
-    if (pendingAuthReject) {
-      pendingAuthReject(error);
-      pendingAuthReject = null;
-      pendingAuthResolve = null;
-    }
-
+    rejectPendingAuth(new Error('Token Google invalide.'));
     return;
   }
 
@@ -178,17 +209,18 @@ function _handleCredentialResponse(response) {
     loginAt: Date.now()
   };
 
-  localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(currentUser));
+  saveStoredUser(currentUser);
 
-  _hideLoginOverlay();
-  _updateUserUI(currentUser);
+  hideLoginOverlay();
+  updateUserUI(currentUser);
+  setAppAccessibilityState(true);
 
   window.dispatchEvent(
-  new CustomEvent('notes-me-authenticated', {
-    detail: currentUser
-  })
-);
-  
+    new CustomEvent('notes-me-authenticated', {
+      detail: currentUser
+    })
+  );
+
   if (pendingAuthResolve) {
     pendingAuthResolve(currentUser);
     pendingAuthResolve = null;
@@ -196,12 +228,37 @@ function _handleCredentialResponse(response) {
   }
 }
 
+function rejectPendingAuth(error) {
+  if (pendingAuthReject) {
+    pendingAuthReject(error);
+    pendingAuthReject = null;
+    pendingAuthResolve = null;
+  }
+
+  console.error(error);
+}
+
 // ─────────────────────────────────────────────────────────
 // Session locale
 // ─────────────────────────────────────────────────────────
 
-function _loadStoredUser() {
-  const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+function saveStoredUser(user) {
+  try {
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+  } catch (error) {
+    console.warn('Impossible de sauvegarder la session utilisateur.', error);
+  }
+}
+
+function loadStoredUser() {
+  let stored = null;
+
+  try {
+    stored = localStorage.getItem(AUTH_STORAGE_KEY);
+  } catch (error) {
+    console.warn('Impossible de lire la session utilisateur.', error);
+    return null;
+  }
 
   if (!stored) {
     return null;
@@ -211,19 +268,19 @@ function _loadStoredUser() {
     const user = JSON.parse(stored);
 
     if (!user?.token || !user?.id) {
-      localStorage.removeItem(AUTH_STORAGE_KEY);
+      removeStoredUser();
       return null;
     }
 
-    const decoded = _parseJwt(user.token);
+    const decoded = parseJwt(user.token);
 
     if (!decoded?.sub || decoded.sub !== user.id) {
-      localStorage.removeItem(AUTH_STORAGE_KEY);
+      removeStoredUser();
       return null;
     }
 
-    if (_isJwtExpired(decoded)) {
-      localStorage.removeItem(AUTH_STORAGE_KEY);
+    if (isJwtExpired(decoded)) {
+      removeStoredUser();
       return null;
     }
 
@@ -237,17 +294,26 @@ function _loadStoredUser() {
     };
   } catch (error) {
     console.warn('Session locale invalide.', error);
-    localStorage.removeItem(AUTH_STORAGE_KEY);
+    removeStoredUser();
     return null;
   }
 }
 
-function _isJwtExpired(decodedToken) {
+function removeStoredUser() {
+  try {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+  } catch (error) {
+    console.warn('Impossible de supprimer la session utilisateur.', error);
+  }
+}
+
+function isJwtExpired(decodedToken) {
   if (!decodedToken?.exp) {
     return true;
   }
 
   const nowInSeconds = Math.floor(Date.now() / 1000);
+
   return Number(decodedToken.exp) <= nowInSeconds;
 }
 
@@ -264,15 +330,16 @@ export function signOut() {
   }
 
   currentUser = null;
-  localStorage.removeItem(AUTH_STORAGE_KEY);
+  removeStoredUser();
 
-  _updateUserUI(null);
-  _showLoginOverlay();
+  updateUserUI(null);
+  showLoginOverlay();
+  setAppAccessibilityState(false);
 
   window.dispatchEvent(new CustomEvent('notes-me-signed-out'));
 
   try {
-    _setupGoogleSignIn();
+    renderGoogleButton();
   } catch (error) {
     console.warn('Impossible de réinitialiser le bouton Google.', error);
   }
@@ -300,7 +367,7 @@ export function isAuthenticated() {
 // UI, overlay de connexion
 // ─────────────────────────────────────────────────────────
 
-function _showLoginOverlay() {
+function showLoginOverlay() {
   const overlay = document.getElementById('loginOverlay');
 
   if (!overlay) {
@@ -313,7 +380,7 @@ function _showLoginOverlay() {
   document.body.style.overflow = 'hidden';
 }
 
-function _hideLoginOverlay() {
+function hideLoginOverlay() {
   const overlay = document.getElementById('loginOverlay');
 
   if (!overlay) {
@@ -326,11 +393,25 @@ function _hideLoginOverlay() {
   document.body.style.overflow = '';
 }
 
+function setAppAccessibilityState(isAuthenticated) {
+  const app = document.getElementById('app');
+
+  if (!app) {
+    return;
+  }
+
+  if (isAuthenticated) {
+    app.removeAttribute('aria-hidden');
+  } else {
+    app.setAttribute('aria-hidden', 'true');
+  }
+}
+
 // ─────────────────────────────────────────────────────────
 // UI, infos utilisateur dans le header
 // ─────────────────────────────────────────────────────────
 
-function _updateUserUI(user) {
+function updateUserUI(user) {
   const userInfoBlock = document.getElementById('userInfoBlock');
   const userName = document.getElementById('userDisplayName');
   const userAvatar = document.getElementById('userAvatar');
@@ -355,21 +436,23 @@ function _updateUserUI(user) {
     if (logoutBtn) {
       logoutBtn.removeAttribute('hidden');
     }
-  } else {
-    if (userName) {
-      userName.textContent = '';
-    }
 
-    if (userAvatar) {
-      userAvatar.removeAttribute('src');
-      userAvatar.alt = 'Avatar utilisateur';
-    }
+    return;
+  }
 
-    userInfoBlock.setAttribute('hidden', '');
+  if (userName) {
+    userName.textContent = '';
+  }
 
-    if (logoutBtn) {
-      logoutBtn.setAttribute('hidden', '');
-    }
+  if (userAvatar) {
+    userAvatar.removeAttribute('src');
+    userAvatar.alt = 'Avatar utilisateur';
+  }
+
+  userInfoBlock.setAttribute('hidden', '');
+
+  if (logoutBtn) {
+    logoutBtn.setAttribute('hidden', '');
   }
 }
 
@@ -377,7 +460,7 @@ function _updateUserUI(user) {
 // Utilitaire JWT, décodage client uniquement
 // ─────────────────────────────────────────────────────────
 
-function _parseJwt(token) {
+function parseJwt(token) {
   try {
     const base64Url = token.split('.')[1];
 
