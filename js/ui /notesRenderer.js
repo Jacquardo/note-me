@@ -160,6 +160,8 @@ export function createNoteCard({
   onRestore,
   onToggleFavorite
 } = {}) {
+  const noteId = note?.id || '';
+
   const item = createElement('article', {
     className: `item ${note.deletedAt ? 'is-deleted' : ''}`.trim(),
     attrs: {
@@ -168,7 +170,7 @@ export function createNoteCard({
       'aria-label': `Ouvrir la note ${note.title || 'sans titre'}`
     },
     dataset: {
-      noteId: note.id
+      noteId
     }
   });
 
@@ -200,7 +202,7 @@ export function createNoteCard({
     if (isInteractiveElement(event.target)) return;
 
     if (typeof onOpen === 'function') {
-      onOpen(note.id);
+      onOpen(noteId);
     }
   });
 
@@ -211,7 +213,7 @@ export function createNoteCard({
     event.preventDefault();
 
     if (typeof onOpen === 'function') {
-      onOpen(note.id);
+      onOpen(noteId);
     }
   });
 
@@ -237,11 +239,14 @@ function createNoteHead(note, onToggleFavorite) {
     textContent: note.favorite ? '★' : '☆',
     ariaLabel: note.favorite ? 'Retirer des favoris' : 'Ajouter aux favoris',
     onClick: (event) => {
+      event.preventDefault();
       event.stopPropagation();
 
-      if (typeof onToggleFavorite === 'function') {
-        onToggleFavorite(note.id);
-      }
+      runCallbackSafely(() => {
+        if (typeof onToggleFavorite === 'function') {
+          onToggleFavorite(note.id);
+        }
+      });
     }
   });
 
@@ -329,11 +334,14 @@ function createNoteActions(note, callbacks = {}) {
       textContent: '↩',
       ariaLabel: 'Restaurer la note',
       onClick: (event) => {
+        event.preventDefault();
         event.stopPropagation();
 
-        if (typeof callbacks.onRestore === 'function') {
-          callbacks.onRestore(note.id);
-        }
+        runCallbackSafely(() => {
+          if (typeof callbacks.onRestore === 'function') {
+            callbacks.onRestore(note.id);
+          }
+        });
       }
     });
 
@@ -347,11 +355,14 @@ function createNoteActions(note, callbacks = {}) {
     textContent: '✏️',
     ariaLabel: 'Modifier la note',
     onClick: (event) => {
+      event.preventDefault();
       event.stopPropagation();
 
-      if (typeof callbacks.onEdit === 'function') {
-        callbacks.onEdit(note.id);
-      }
+      runCallbackSafely(() => {
+        if (typeof callbacks.onEdit === 'function') {
+          callbacks.onEdit(note.id);
+        }
+      });
     }
   });
 
@@ -360,11 +371,14 @@ function createNoteActions(note, callbacks = {}) {
     textContent: '🗑️',
     ariaLabel: 'Supprimer la note',
     onClick: (event) => {
+      event.preventDefault();
       event.stopPropagation();
 
-      if (typeof callbacks.onDelete === 'function') {
-        callbacks.onDelete(note.id);
-      }
+      runCallbackSafely(() => {
+        if (typeof callbacks.onDelete === 'function') {
+          callbacks.onDelete(note.id);
+        }
+      });
     }
   });
 
@@ -418,6 +432,16 @@ function applyNoteBackgroundToElement(item, note) {
   }
 
   item.classList.add('has-background-image');
+}
+
+function runCallbackSafely(callback) {
+  /*
+    On décale légèrement l’action pour laisser le clic courant se terminer.
+    Cela évite les bugs où la confirmation s’ouvre seulement au clic suivant.
+  */
+  window.setTimeout(() => {
+    callback();
+  }, 0);
 }
 
 function getSafeRenderLimit(state) {
