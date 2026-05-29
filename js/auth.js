@@ -324,9 +324,17 @@ function isJwtExpired(decodedToken) {
 /**
  * Déconnecte l'utilisateur et affiche l'écran de connexion.
  */
-export function signOut() {
+export function signOut({ revoke = false } = {}) {
+  const userEmail = currentUser?.email || '';
+
   if (window.google?.accounts?.id) {
     google.accounts.id.disableAutoSelect();
+
+    try {
+      google.accounts.id.cancel();
+    } catch (error) {
+      console.info('Aucun prompt Google à annuler.', error);
+    }
   }
 
   currentUser = null;
@@ -337,6 +345,12 @@ export function signOut() {
   setAppAccessibilityState(false);
 
   window.dispatchEvent(new CustomEvent('notes-me-signed-out'));
+
+  if (revoke && userEmail && window.google?.accounts?.id?.revoke) {
+    google.accounts.id.revoke(userEmail, (response) => {
+      console.info('Accès Google révoqué pour Notes Me :', response);
+    });
+  }
 
   try {
     renderGoogleButton();
