@@ -119,6 +119,16 @@ html[data-theme="light"] .item {
   --note-overlay-bottom: 0.68;
 }
 
+html[data-theme="dark"] .item.has-background-image {
+  --note-overlay-top: 0.42;
+  --note-overlay-bottom: 0.36;
+}
+
+html[data-theme="light"] .item.has-background-image {
+  --note-overlay-top: 0.62;
+  --note-overlay-bottom: 0.54;
+}
+
 .item::after {
   content: "";
   position: absolute;
