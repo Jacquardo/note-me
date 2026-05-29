@@ -52,6 +52,9 @@ const CONTINUOUS_SYNC_INTERVAL_MS = 45 * 1000;
 let continuousSyncTimer = null;
 let continuousSyncStarted = false;
 let isPullingFromGoogleDrive = false;
+let isPushingToGoogleDrive = false;
+let isGoogleDriveSyncAvailable = false;
+let authLifecycleBound = false;
 
 
 document.addEventListener('DOMContentLoaded', init);
@@ -71,10 +74,12 @@ async function init() {
   }
 
   try {
-    await initGoogleDriveAuth();
-  } catch (driveError) {
-    console.warn('Google Drive Sync non initialisé. Mode local uniquement.', driveError);
-  }
+  await initGoogleDriveAuth();
+  isGoogleDriveSyncAvailable = true;
+} catch (driveError) {
+  isGoogleDriveSyncAvailable = false;
+  console.warn('Google Drive Sync non initialisé. Mode local uniquement.', driveError);
+}
 
   hydrateRefs();
   bindEssentialUi();
@@ -85,11 +90,14 @@ async function init() {
     restoreLocalPreferences();
     await initDatabase();
     await restoreSettings();
-    bindApplicationUi();
+bindApplicationUi();
+
 await loadNotes();
 await renderApp();
 
-startContinuousSync();
+if (isGoogleDriveSyncAvailable) {
+  startContinuousSync();
+}
 
 setState({ isReady: true, isLoading: false });
 showToast(`Notes Me V${APP_VERSION} est prêt.`, 'success', { duration: 1800 });
@@ -112,6 +120,7 @@ function bindEssentialUi() {
   bindBasicModalButtons();
   bindKeyboardShortcuts();
   bindLogout();
+  bindAuthLifecycle();
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -133,12 +142,63 @@ function bindLogout() {
 
     if (!confirmed) return;
 
+    signOut();
+
+    showToast('Vous avez été déconnecté.', 'info');
+  });
+}
+
+function bindAuthLifecycle() {
+  if (authLifecycleBound) {
+    return;
+  }
+
+  authLifecycleBound = true;
+
+  window.addEventListener('notes-me-authenticated', async () => {
+    try {
+      await initGoogleDriveAuth();
+      isGoogleDriveSyncAvailable = true;
+
+      await loadNotes();
+      resetPagination();
+      await renderApp();
+
+      startContinuousSync();
+
+      showToast('Synchronisation Google Drive réactivée.', 'success');
+    } catch (error) {
+      isGoogleDriveSyncAvailable = false;
+
+      console.warn('Impossible de réactiver Google Drive après connexion.', error);
+
+      showToast(
+        'Connexion réussie, mais Google Drive n’est pas disponible pour le moment.',
+        'warning',
+        { duration: 5000 }
+      );
+    }
+  });
+
+  window.addEventListener('notes-me-signed-out', async () => {
     stopContinuousSync();
 
-clearGoogleDriveSession();
-signOut();
+    isGoogleDriveSyncAvailable = false;
 
-showToast('Vous avez été déconnecté.', 'info');
+    clearGoogleDriveSession();
+
+    setState({
+      notes: [],
+      filteredNotes: []
+    });
+
+    resetPagination();
+
+    try {
+      await renderApp();
+    } catch (error) {
+      console.warn('Impossible de rafraîchir l’interface après déconnexion.', error);
+    }
   });
 }
 
@@ -269,6 +329,17 @@ async function loadNotes() {
     }
   }
 
+  if (!isGoogleDriveSyncAvailable) {
+    setSyncStatus('Mode local', 'error');
+
+    setState({
+      notes: localNotes,
+      filteredNotes: []
+    });
+
+    return state.notes;
+  }
+
   try {
     setSyncStatus('Chargement Google Drive...', 'syncing');
     showToast('Chargement des notes Google Drive...', 'info', { duration: 1800 });
@@ -316,13 +387,28 @@ async function loadNotes() {
     return state.notes;
   }
 }
+
 let googleDriveSyncQueue = Promise.resolve();
 
 function persistNotesToGoogleDrive() {
+  if (!isGoogleDriveSyncAvailable) {
+    setSyncStatus('Mode local', 'error');
+
+    showToast(
+      'Note enregistrée localement. Google Drive n’est pas disponible.',
+      'warning',
+      { duration: 4000 }
+    );
+
+    return Promise.resolve();
+  }
+
   googleDriveSyncQueue = googleDriveSyncQueue
     .catch(() => {})
     .then(async () => {
       try {
+        isPushingToGoogleDrive = true;
+
         setSyncStatus('Synchronisation Google Drive...', 'syncing');
 
         await saveNotesToGoogleDrive(state.notes);
@@ -338,6 +424,8 @@ function persistNotesToGoogleDrive() {
           'warning',
           { duration: 5000 }
         );
+      } finally {
+        isPushingToGoogleDrive = false;
       }
     });
 
@@ -345,7 +433,12 @@ function persistNotesToGoogleDrive() {
 }
 
 
+
 function startContinuousSync() {
+  if (!isGoogleDriveSyncAvailable) {
+    return;
+  }
+
   if (continuousSyncStarted) {
     return;
   }
@@ -365,6 +458,7 @@ function startContinuousSync() {
   window.addEventListener('focus', handleFocusSync);
   document.addEventListener('visibilitychange', handleVisibilitySync);
 }
+
 
 function stopContinuousSync() {
   continuousSyncStarted = false;
@@ -400,7 +494,15 @@ function handleVisibilitySync() {
 }
 
 async function syncFromGoogleDrive({ silent = false } = {}) {
+  if (!isGoogleDriveSyncAvailable) {
+    return;
+  }
+
   if (isPullingFromGoogleDrive) {
+    return;
+  }
+
+  if (isPushingToGoogleDrive) {
     return;
   }
 
@@ -425,6 +527,8 @@ async function syncFromGoogleDrive({ silent = false } = {}) {
     }
 
     setSyncStatus('Synchronisation Google Drive...', 'syncing');
+
+    await googleDriveSyncQueue.catch(() => {});
 
     const remoteNotes = await loadNotesFromGoogleDrive();
     const safeRemoteNotes = Array.isArray(remoteNotes) ? remoteNotes : [];
@@ -1377,9 +1481,9 @@ function getBackgroundName(value = '') {
 function openEditor(note = null) {
   resetEditorDraft();
 
-  if (note) {
-    state.editingNoteId = note.id;
+  state.editingNoteId = note ? note.id : null;
 
+  if (note) {
     setEditorDraft({
       title: note.title || '',
       category: note.category || '',
