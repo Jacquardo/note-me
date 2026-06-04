@@ -348,16 +348,50 @@ async function loadNotes() {
 
   try {
     setSyncStatus('Chargement Google Drive...', 'syncing');
+    showToast('Chargement des notes Google Drive...', 'info', { duration: 1800 });
 
-  if (!isGoogleDriveSyncAvailable) {
-  setSyncStatus('Mode local', 'error');
+    const googleNotes = await loadNotesFromGoogleDrive();
 
-  setState({
-    notes: localNotes,
-    filteredNotes: []
-  });
+    let finalNotes = Array.isArray(googleNotes) ? googleNotes : [];
 
-  return state.notes;
+    if (finalNotes.length === 0 && localNotes.length > 0) {
+      finalNotes = localNotes;
+      await saveNotesToGoogleDrive(finalNotes);
+      showToast('Notes locales migrées vers Google Drive.', 'success');
+    }
+
+    setState({
+      notes: finalNotes,
+      filteredNotes: []
+    });
+
+    if (notesRepository && typeof notesRepository.saveNoteToDB === 'function') {
+      for (const note of finalNotes) {
+        await notesRepository.saveNoteToDB(note);
+      }
+    }
+
+    setSyncStatus('Synchronisé avec Google Drive', 'success');
+
+    return state.notes;
+  } catch (error) {
+    console.error('Erreur de chargement Google Drive :', error);
+
+    setSyncStatus('Mode local', 'error');
+
+    showToast(
+      'Google Drive indisponible. Chargement depuis la copie locale.',
+      'warning',
+      { duration: 5000 }
+    );
+
+    setState({
+      notes: localNotes,
+      filteredNotes: []
+    });
+
+    return state.notes;
+  }
 }
 
   try {
@@ -2350,89 +2384,6 @@ async function askConfirmation(title, message) {
     modal.addEventListener('click', onBackdropClick, true);
     document.addEventListener('keydown', onKeyDown, true);
 
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        openModal(modal, cancelButton);
-      });
-    });
-  });
-
-  return activeConfirmationPromise;
-}
-
-  setMenuOpen(false);
-
-  activeConfirmationPromise = new Promise((resolve) => {
-    const modal = refs.confirmModal;
-    const confirmTitle = refs.confirmTitle;
-    const confirmMessage = refs.confirmMessage;
-    const okButton = refs.confirmOkBtn;
-    const cancelButton = refs.confirmCancelBtn;
-
-    let resolved = false;
-
-    const finish = (value) => {
-      if (resolved) return;
-
-      resolved = true;
-
-      okButton.removeEventListener('click', onConfirm);
-      cancelButton.removeEventListener('click', onCancel);
-      modal.removeEventListener('click', onBackdropClick, true);
-      document.removeEventListener('keydown', onKeyDown, true);
-
-      closeModal(modal);
-
-      activeConfirmationPromise = null;
-
-      resolve(value);
-    };
-
-    const onConfirm = (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-
-      finish(true);
-    };
-
-    const onCancel = (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-
-      finish(false);
-    };
-
-    const onBackdropClick = (event) => {
-      if (event.target !== modal) return;
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      finish(false);
-    };
-
-    const onKeyDown = (event) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        event.stopPropagation();
-
-        finish(false);
-      }
-    };
-
-    confirmTitle.textContent = title || 'Confirmation';
-    confirmMessage.textContent = message || 'Êtes-vous sûr ?';
-
-    okButton.addEventListener('click', onConfirm);
-    cancelButton.addEventListener('click', onCancel);
-    modal.addEventListener('click', onBackdropClick, true);
-    document.addEventListener('keydown', onKeyDown, true);
-
-    /*
-      Important :
-      on ouvre la modale à la frame suivante pour éviter les conflits
-      avec le clic qui vient de déclencher l’action.
-    */
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         openModal(modal, cancelButton);
