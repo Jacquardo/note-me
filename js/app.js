@@ -394,20 +394,6 @@ async function loadNotes() {
   }
 }
 
-  try {
-    setSyncStatus('Chargement Google Drive...', 'syncing');
-    showToast('Chargement des notes Google Drive...', 'info', { duration: 1800 });
-
-    const googleNotes = await loadNotesFromGoogleDrive();
-
-    let finalNotes = Array.isArray(googleNotes) ? googleNotes : [];
-
-    if (finalNotes.length === 0 && localNotes.length > 0) {
-      finalNotes = localNotes;
-      await saveNotesToGoogleDrive(finalNotes);
-      showToast('Notes locales migrées vers Google Drive.', 'success');
-    }
-
     setState({
       notes: finalNotes,
       filteredNotes: []
