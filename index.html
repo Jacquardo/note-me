@@ -51,37 +51,37 @@
 
 <body data-google-client-id="180670406711-3t7e475knnbt8lckloot895qqu7hu9s0.apps.googleusercontent.com">
   <a class="skip-link" href="#mainContent">Aller au contenu principal</a>
-  
-<!-- ── Écran de connexion Google ─────────────────────────── -->
-<div
-  id="loginOverlay"
-  class="login-overlay"
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="loginTitle"
-  aria-hidden="false"
->
-  <div class="login-card">
-    <img src="./assets/logo.png" alt="Logo Notes Me" class="login-logo">
 
-    <h1 id="loginTitle" class="login-title">Notes Me</h1>
-    <p class="login-subtitle">
-      Connectez-vous avec votre compte Google<br>pour accéder à vos notes.
-    </p>
+  <!-- ── Écran de connexion Google ─────────────────────────── -->
+  <div
+    id="loginOverlay"
+    class="login-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="loginTitle"
+    aria-hidden="false"
+  >
+    <div class="login-card">
+      <img src="./assets/logo.png" alt="Logo Notes Me" class="login-logo">
 
-    <div class="login-divider"></div>
+      <h1 id="loginTitle" class="login-title">Notes Me</h1>
+      <p class="login-subtitle">
+        Connectez-vous avec votre compte Google<br>pour accéder à vos notes.
+      </p>
 
-    <!-- Le bouton Google sera rendu ici par la lib GSI -->
-    <div id="googleSignInBtn" aria-label="Se connecter avec Google"></div>
+      <div class="login-divider"></div>
 
-    <p class="login-privacy">
-  Vos notes sont synchronisées dans l’espace privé Google Drive de l’application.<br>
-  Elles ne sont pas visibles dans votre Drive classique.
-    </p>
+      <!-- Le bouton Google sera rendu ici par la lib GSI -->
+      <div id="googleSignInBtn" aria-label="Se connecter avec Google"></div>
+
+      <p class="login-privacy">
+        Vos notes sont synchronisées dans l'espace privé Google Drive de l'application.<br>
+        Elles ne sont pas visibles dans votre Drive classique.
+      </p>
+    </div>
   </div>
-</div>
-<!-- ── Fin overlay connexion ──────────────────────────────── -->
-  
+  <!-- ── Fin overlay connexion ──────────────────────────────── -->
+
   <div id="app" class="app-shell" aria-hidden="true">
     <header class="title-container" role="banner">
       <div class="brand-block">
@@ -117,11 +117,10 @@
             📥 Import ZIP
           </button>
 
-          <!-- ✅ Ajouter application/x-zip-compressed pour Windows -->
-          <input id="importZipInput" type="file" accept=".zip,application/zip,application/x-zip-compressed" hidden>   
+          <input id="importZipInput" type="file" accept=".zip,application/zip,application/x-zip-compressed" hidden>
 
           <button id="installAppBtn" class="nav-menu-btn btn btn-secondary" type="button" hidden>
-            📲 Installer l’application
+            📲 Installer l'application
           </button>
 
           <button id="toggleTrashViewBtn" class="nav-menu-btn btn btn-secondary" type="button">
@@ -143,22 +142,22 @@
           <button id="helpBtn" class="nav-menu-btn btn btn-secondary" type="button">
             ❔ Aide
           </button>
-          
+
           <button id="logoutBtn" class="nav-menu-btn btn btn-danger" type="button" hidden>
             🚪 Se déconnecter
           </button>
         </div>
       </nav>
-      <!-- Infos utilisateur connecté -->
-    <div id="userInfoBlock" class="user-info-block" hidden>
-      <img id="userAvatar" class="user-avatar" src="" alt="Avatar utilisateur">
-      <span id="userDisplayName" class="user-display-name"></span>
-    </div>
 
-    <div id="syncStatusBlock" class="sync-status-block" hidden>
-     <span id="syncStatusText">Non synchronisé</span>
-    </div>
-      
+      <!-- Infos utilisateur connecté -->
+      <div id="userInfoBlock" class="user-info-block" hidden>
+        <img id="userAvatar" class="user-avatar" src="" alt="Avatar utilisateur">
+        <span id="userDisplayName" class="user-display-name"></span>
+      </div>
+
+      <div id="syncStatusBlock" class="sync-status-block" hidden>
+        <span id="syncStatusText">Non synchronisé</span>
+      </div>
     </header>
 
     <main id="mainContent" class="main-content" role="main" tabindex="-1">
@@ -190,8 +189,8 @@
             <option value="custom">Ordre personnalisé</option>
           </select>
 
-          <label class="sr-only" for="viewModeSelect">Mode d’affichage</label>
-          <select id="viewModeSelect" class="toolbar-select toolbar-mini" aria-label="Mode d’affichage">
+          <label class="sr-only" for="viewModeSelect">Mode d'affichage</label>
+          <select id="viewModeSelect" class="toolbar-select toolbar-mini" aria-label="Mode d'affichage">
             <option value="cards">Vue cartes</option>
             <option value="list">Vue liste</option>
             <option value="compact">Vue compacte</option>
@@ -286,7 +285,7 @@
     aria-labelledby="editorModalTitle"
   >
     <div class="modal-card editor-card">
-      <button id="closeEditorModalBtn" class="modal-close" type="button" aria-label="Fermer l’éditeur">
+      <button id="closeEditorModalBtn" class="modal-close" type="button" aria-label="Fermer l'éditeur">
         ✖
       </button>
 
@@ -311,8 +310,8 @@
         </div>
       </div>
 
-      <div id="emojiPanel" class="emoji-panel hidden" aria-label="Sélecteur d’emojis">
-        <div class="emoji-tabs" role="tablist" aria-label="Catégories d’emojis">
+      <div id="emojiPanel" class="emoji-panel hidden" aria-label="Sélecteur d'emojis">
+        <div class="emoji-tabs" role="tablist" aria-label="Catégories d'emojis">
           <button class="emoji-tab active" type="button" data-group="recent" role="tab" aria-selected="true">Récents</button>
           <button class="emoji-tab" type="button" data-group="smileys" role="tab" aria-selected="false">Smileys</button>
           <button class="emoji-tab" type="button" data-group="symbols" role="tab" aria-selected="false">Symboles</button>
@@ -345,11 +344,12 @@
 
       <div class="editor-grid">
         <div class="editor-main">
+
           <label class="editor-label" for="titleInput">Titre</label>
           <input id="titleInput" type="text" placeholder="Titre de la note" maxlength="160" autocomplete="off">
 
           <label class="editor-label" for="categoryInput">Catégorie</label>
-          <input id="categoryInput" type="text" list="categorySuggestions" placeholder="Exemple : Client, Compta, Perso">
+          <input id="categoryInput" type="text" list="categorySuggestions" placeholder="Exemple : Client, Compta, Perso" autocomplete="off">
           <datalist id="categorySuggestions"></datalist>
 
           <label class="editor-label" for="tagsInput">Tags</label>
@@ -358,7 +358,8 @@
           <div class="editor-row">
             <div class="field-group">
               <label class="editor-label" for="colorPaletteInput">Couleur</label>
-              <input id="colorInput" type="color" value="#fff8a6">
+              <input id="colorPaletteInput" type="color" value="#fff8a6">
+              <input id="colorInput" type="hidden" value="#fff8a6">
             </div>
 
             <div class="field-group">
@@ -379,8 +380,15 @@
             <button class="color-option" type="button" data-color="#e7d8ff" aria-label="Lilas"></button>
           </div>
 
+          <!-- ── Sélecteur de fond de note ──────────────────── -->
           <div class="background-picker">
-            <button id="backgroundToggleBtn" class="btn btn-secondary" type="button" aria-expanded="false" aria-controls="backgroundPickerPanel">
+            <button
+              id="backgroundToggleBtn"
+              class="btn btn-secondary"
+              type="button"
+              aria-expanded="false"
+              aria-controls="backgroundPickerPanel"
+            >
               🖼️ Fond de note
             </button>
 
@@ -389,11 +397,24 @@
 
             <div
               id="backgroundPickerPanel"
-             class="background-picker-panel hidden"
-             role="listbox"
-             aria-label="Choisir un fond de note"></div>
-            </div>
-          
+              class="background-picker-panel hidden"
+              role="listbox"
+              aria-label="Choisir un fond de note"
+            ></div>
+
+            <!-- Bouton de confirmation du fond sélectionné -->
+            <button
+              id="applyBackgroundBtn"
+              class="btn btn-primary apply-background-btn hidden"
+              type="button"
+              aria-live="polite"
+              aria-label="Appliquer le fond sélectionné à la note"
+            >
+              ✅ Appliquer ce fond
+            </button>
+          </div>
+          <!-- ── Fin sélecteur de fond ───────────────────────── -->
+
           <button
             id="favoriteToggleBtn"
             class="btn btn-secondary favorite-toggle-btn"
@@ -414,13 +435,14 @@
               Retirer
             </button>
           </div>
-  
+
+        </div>
 
         <aside class="editor-side" aria-label="Aperçu de la note">
           <p class="preview-title">Aperçu</p>
           <div id="notePreview" aria-hidden="true"></div>
         </aside>
-      
+      </div>
 
       <div class="editor-actions">
         <button id="cancelEditBtn" class="btn btn-secondary" type="button">
@@ -443,7 +465,7 @@
     aria-labelledby="imageModalTitle"
   >
     <div class="modal-card">
-      <button id="closeImageModalBtn" class="modal-close" type="button" aria-label="Fermer l’image">
+      <button id="closeImageModalBtn" class="modal-close" type="button" aria-label="Fermer l'image">
         ✖
       </button>
 
@@ -522,7 +544,7 @@
     aria-labelledby="helpModalTitle"
   >
     <div class="modal-card">
-      <button id="closeHelpModalBtn" class="modal-close" type="button" aria-label="Fermer l’aide">
+      <button id="closeHelpModalBtn" class="modal-close" type="button" aria-label="Fermer l'aide">
         ✖
       </button>
 
@@ -548,8 +570,8 @@
         <h3>Raccourcis</h3>
         <ul>
           <li><kbd aria-label="Touche N">N</kbd> : nouvelle note.</li>
-          <li><kbd>Ctrl</kbd> + <kbd>S</kbd> : enregistrer depuis l’éditeur.</li>
-          <li><kbd>Échap</kbd> : fermer la fenêtre active.</li>
+          <li><kbd aria-label="Ctrl">Ctrl</kbd> + <kbd aria-label="S">S</kbd> : enregistrer depuis l'éditeur.</li>
+          <li><kbd aria-label="Échap">Échap</kbd> : fermer la fenêtre active.</li>
         </ul>
       </div>
     </div>
