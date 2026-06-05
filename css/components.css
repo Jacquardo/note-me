@@ -311,6 +311,13 @@ textarea::placeholder {
   font-weight: 700;
 }
 
+/* État de pré-sélection (avant confirmation) */
+.background-option.pending {
+  outline: 2px dashed var(--accent-a);
+  outline-offset: 2px;
+  opacity: 0.85;
+}
+
 
 .background-thumb {
   width: 44px;
