@@ -117,7 +117,8 @@
             📥 Import ZIP
           </button>
 
-          <input id="importZipInput" type="file" accept=".zip,application/zip" hidden>
+          <!-- ✅ Ajouter application/x-zip-compressed pour Windows -->
+          <input id="importZipInput" type="file" accept=".zip,application/zip,application/x-zip-compressed" hidden>   
 
           <button id="installAppBtn" class="nav-menu-btn btn btn-secondary" type="button" hidden>
             📲 Installer l’application
@@ -345,20 +346,19 @@
       <div class="editor-grid">
         <div class="editor-main">
           <label class="editor-label" for="titleInput">Titre</label>
-          <input id="titleInput" type="text" placeholder="Titre de la note" maxlength="160">
+          <input id="titleInput" type="text" placeholder="Titre de la note" maxlength="160" autocomplete="off">
 
           <label class="editor-label" for="categoryInput">Catégorie</label>
           <input id="categoryInput" type="text" list="categorySuggestions" placeholder="Exemple : Client, Compta, Perso">
           <datalist id="categorySuggestions"></datalist>
 
           <label class="editor-label" for="tagsInput">Tags</label>
-          <input id="tagsInput" type="text" placeholder="urgent, client, facture">
+          <input id="tagsInput" type="text" placeholder="urgent, client, facture" autocomplete="off">
 
           <div class="editor-row">
             <div class="field-group">
               <label class="editor-label" for="colorPaletteInput">Couleur</label>
-              <input id="colorPaletteInput" type="color" value="#fff8a6">
-              <input id="colorInput" type="hidden" value="#fff8a6">
+              <input id="colorInput" type="color" value="#fff8a6">
             </div>
 
             <div class="field-group">
@@ -388,11 +388,12 @@
             <input id="backgroundImageInput" type="hidden" value="">
 
             <div
-             id="backgroundPickerPanel"
+              id="backgroundPickerPanel"
              class="background-picker-panel hidden"
              role="listbox"
              aria-label="Choisir un fond de note"></div>
-
+            </div>
+          
           <button
             id="favoriteToggleBtn"
             class="btn btn-secondary favorite-toggle-btn"
@@ -413,13 +414,13 @@
               Retirer
             </button>
           </div>
-        </div>
+  
 
         <aside class="editor-side" aria-label="Aperçu de la note">
           <p class="preview-title">Aperçu</p>
           <div id="notePreview" aria-hidden="true"></div>
         </aside>
-      </div>
+      
 
       <div class="editor-actions">
         <button id="cancelEditBtn" class="btn btn-secondary" type="button">
@@ -546,7 +547,7 @@
 
         <h3>Raccourcis</h3>
         <ul>
-          <li><kbd>N</kbd> : nouvelle note.</li>
+          <li><kbd aria-label="Touche N">N</kbd> : nouvelle note.</li>
           <li><kbd>Ctrl</kbd> + <kbd>S</kbd> : enregistrer depuis l’éditeur.</li>
           <li><kbd>Échap</kbd> : fermer la fenêtre active.</li>
         </ul>
