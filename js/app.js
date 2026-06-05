@@ -75,9 +75,10 @@ async function init() {
   }
 
  try {
-  await initGoogleDriveAuth();
-  isGoogleDriveSyncAvailable = true;
-} catch (driveError) {
+  try {
+    await initGoogleDriveAuth();
+    isGoogleDriveSyncAvailable = true;
+  } catch (driveError) {
   isGoogleDriveSyncAvailable = false;
   console.warn('Google Drive Sync non initialisé. Mode local uniquement.', driveError);
 }
@@ -91,9 +92,9 @@ async function init() {
     restoreLocalPreferences();
     await initDatabase();
     await restoreSettings();
-bindApplicationUi();
+  bindApplicationUi();
+  await loadNotes();
 
-await loadNotes();
 await renderApp();
 
 if (isGoogleDriveSyncAvailable) {
@@ -1211,9 +1212,15 @@ function bindEditor() {
   }
   
 initBackgroundPicker();
+
+  refs.backgroundToggleBtn?.addEventListener('click', () => {
+  if (!refs.backgroundPickerPanel) return;
+  const hidden = refs.backgroundPickerPanel.classList.toggle('hidden');
+  refs.backgroundToggleBtn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
+});
   
   const applyBackgroundBtn = refs.applyBackgroundBtn || document.getElementById('applyBackgroundBtn');
-applyBackgroundBtn?.addEventListener('click', () => {
+  applyBackgroundBtn?.addEventListener('click', () => {
   const val = applyBackgroundBtn.dataset.pendingValue ?? '';
   const name = applyBackgroundBtn.dataset.pendingName || getBackgroundName(val);
 
@@ -1476,11 +1483,12 @@ function setEditorBackground(value = '', label = '') {
 
   if (panel) {
     for (const button of panel.querySelectorAll('.background-option')) {
-      const isActive = button.dataset.background === normalizedValue;
-
-      button.classList.toggle('active', isActive);
-      button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-    }
+  const isActive = button.dataset.background === normalizedValue;
+  button.classList.toggle('active', isActive);
+  button.classList.remove('pending');                                    // ← ajout
+  button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  button.setAttribute('aria-selected', isActive ? 'true' : 'false');   // ← ajout
+}
   }
 
   updatePreview();
@@ -1798,7 +1806,7 @@ const note = {
   category: draft.category.trim(),
   tags: parseTags(draft.tags),
   color: draft.color || DEFAULT_SETTINGS.defaultNoteColor,
-  backgroundImage: draft.backgroundImage || refs.backgroundImageInput?.value || '',
+  backgroundImage: draft.backgroundImage || '',
   favorite: Boolean(draft.favorite),
   content: draft.content.trim(),
   fileId: fileId || '',
