@@ -1212,12 +1212,30 @@ function bindEditor() {
   
 initBackgroundPicker();
   
-  refs.backgroundToggleBtn?.addEventListener('click', () => {
-    if (!refs.backgroundPickerPanel) return;
+  const applyBackgroundBtn = refs.applyBackgroundBtn || document.getElementById('applyBackgroundBtn');
+applyBackgroundBtn?.addEventListener('click', () => {
+  const val = applyBackgroundBtn.dataset.pendingValue ?? '';
+  const name = applyBackgroundBtn.dataset.pendingName || getBackgroundName(val);
 
-    const hidden = refs.backgroundPickerPanel.classList.toggle('hidden');
-    refs.backgroundToggleBtn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
-  });
+  setEditorBackground(val, name);
+
+  if (refs.backgroundPickerPanel) refs.backgroundPickerPanel.classList.add('hidden');
+  if (refs.backgroundToggleBtn) refs.backgroundToggleBtn.setAttribute('aria-expanded', 'false');
+
+  delete applyBackgroundBtn.dataset.pendingValue;
+  delete applyBackgroundBtn.dataset.pendingName;
+
+  applyBackgroundBtn.textContent = '✔ Fond appliqué';
+  applyBackgroundBtn.disabled = true;
+
+  setTimeout(() => {
+    applyBackgroundBtn.classList.add('hidden');
+    applyBackgroundBtn.textContent = '✅ Appliquer ce fond';
+    applyBackgroundBtn.disabled = false;
+  }, 1500);
+
+  syncEditorDraftFromForm();
+});
 }
 
 function bindFiltersAndSearch() {
@@ -1423,16 +1441,10 @@ label.textContent = background.name;
     button.appendChild(preview);
     button.appendChild(label);
 
+button.setAttribute('role', 'option');
+button.setAttribute('aria-selected', 'false');
 button.addEventListener('click', () => {
-  setEditorBackground(background.value, background.name);
-
-  if (refs.backgroundPickerPanel) {
-    refs.backgroundPickerPanel.classList.add('hidden');
-  }
-
-  if (refs.backgroundToggleBtn) {
-    refs.backgroundToggleBtn.setAttribute('aria-expanded', 'false');
-  }
+  setPendingBackground(background.value, background.name);
 });
 
     panel.appendChild(button);
@@ -1488,6 +1500,47 @@ function getBackgroundName(value = '') {
   return 'Fond personnalisé';
 }
 
+/**
+ * Marque un fond comme "en attente" sans l'appliquer.
+ * Affiche le bouton #applyBackgroundBtn pour confirmer.
+ */
+function setPendingBackground(value = '', name = '') {
+  const panel = refs.backgroundPickerPanel || document.getElementById('backgroundPickerPanel');
+  if (panel) {
+    for (const btn of panel.querySelectorAll('.background-option')) {
+      const isPending = btn.dataset.background === value;
+      btn.classList.toggle('pending', isPending);
+      btn.setAttribute('aria-selected', isPending ? 'true' : 'false');
+    }
+  }
+  const applyBtn = refs.applyBackgroundBtn || document.getElementById('applyBackgroundBtn');
+  if (applyBtn) {
+    applyBtn.dataset.pendingValue = value;
+    applyBtn.dataset.pendingName = name || getBackgroundName(value);
+    applyBtn.classList.remove('hidden');
+    applyBtn.textContent = '✅ Appliquer ce fond';
+    applyBtn.disabled = false;
+  }
+}
+
+/** Remet le bouton #applyBackgroundBtn à son état initial. */
+function resetApplyBackgroundBtn() {
+  const btn = refs.applyBackgroundBtn || document.getElementById('applyBackgroundBtn');
+  if (!btn) return;
+  btn.classList.add('hidden');
+  btn.textContent = '✅ Appliquer ce fond';
+  btn.disabled = false;
+  delete btn.dataset.pendingValue;
+  delete btn.dataset.pendingName;
+  const panel = refs.backgroundPickerPanel || document.getElementById('backgroundPickerPanel');
+  if (panel) {
+    for (const b of panel.querySelectorAll('.background-option.pending')) {
+      b.classList.remove('pending');
+      b.setAttribute('aria-selected', 'false');
+    }
+  }
+}
+
 function openEditor(note = null) {
   resetEditorDraft();
 
@@ -1522,6 +1575,7 @@ function closeEditor() {
   closeModal(refs.editorModal);
   removeSelectedFile(false);
   resetEditorDraft();
+  resetApplyBackgroundBtn();
 }
 
 function syncEditorDraftFromForm() {
