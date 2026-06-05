@@ -199,6 +199,11 @@ code {
   border: 0;
   clip-path: inset(50%);
 }
+  .apply-background-btn {
+  margin-top: 8px;
+  width: 100%;
+  transition: opacity var(--transition-normal);
+}
 
 /* ─────────────────────────────────────────────────────────────
    Lien d’évitement
