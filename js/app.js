@@ -1474,7 +1474,7 @@ function setEditorBackground(value = '', label = '') {
 
   const panel = refs.backgroundPickerPanel || document.getElementById('backgroundPickerPanel');
 
-if (panel) {
+  if (panel) {
     for (const button of panel.querySelectorAll('.background-option')) {
       const isActive = button.dataset.background === normalizedValue;   // ← 6 espaces
       button.classList.toggle('active', isActive);
