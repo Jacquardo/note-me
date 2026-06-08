@@ -74,14 +74,13 @@ async function init() {
     return;
   }
 
- try {
   try {
     await initGoogleDriveAuth();
     isGoogleDriveSyncAvailable = true;
   } catch (driveError) {
-  isGoogleDriveSyncAvailable = false;
-  console.warn('Google Drive Sync non initialisé. Mode local uniquement.', driveError);
-}
+    isGoogleDriveSyncAvailable = false;
+    console.warn('Google Drive Sync non initialisé. Mode local uniquement.', driveError);
+  }
 
   hydrateRefs();
   bindEssentialUi();
@@ -92,18 +91,17 @@ async function init() {
     restoreLocalPreferences();
     await initDatabase();
     await restoreSettings();
-  bindApplicationUi();
-  await loadNotes();
+    bindApplicationUi();
+    await loadNotes();
+    await renderApp();
 
-await renderApp();
+    if (isGoogleDriveSyncAvailable) {
+      startContinuousSync();
+    }
 
-if (isGoogleDriveSyncAvailable) {
-  startContinuousSync();
-}
-
-setState({ isReady: true, isLoading: false });
-showToast(`Notes Me V${APP_VERSION} est prêt.`, 'success', { duration: 1800 });
-handleInitialUrlActions();
+    setState({ isReady: true, isLoading: false });
+    showToast(`Notes Me V${APP_VERSION} est prêt.`, 'success', { duration: 1800 });
+    handleInitialUrlActions();
   } catch (error) {
     console.error('Erreur critique au démarrage :', error);
     setState({ isLoading: false });
@@ -1211,39 +1209,43 @@ function bindEditor() {
     });
   }
   
-initBackgroundPicker();
+  initBackgroundPicker();  // ← ajouter 2 espaces d'indentation
 
   refs.backgroundToggleBtn?.addEventListener('click', () => {
-  if (!refs.backgroundPickerPanel) return;
-  const hidden = refs.backgroundPickerPanel.classList.toggle('hidden');
-  refs.backgroundToggleBtn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
-});
+    if (!refs.backgroundPickerPanel) return;  // ← 4 espaces
+    const hidden = refs.backgroundPickerPanel.classList.toggle('hidden');
+    refs.backgroundToggleBtn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
+  });  // ← 2 espaces pour la fermeture
   
+ 
   const applyBackgroundBtn = refs.applyBackgroundBtn || document.getElementById('applyBackgroundBtn');
   applyBackgroundBtn?.addEventListener('click', () => {
-  const val = applyBackgroundBtn.dataset.pendingValue ?? '';
-  const name = applyBackgroundBtn.dataset.pendingName || getBackgroundName(val);
-
-  setEditorBackground(val, name);
-
-  if (refs.backgroundPickerPanel) refs.backgroundPickerPanel.classList.add('hidden');
-  if (refs.backgroundToggleBtn) refs.backgroundToggleBtn.setAttribute('aria-expanded', 'false');
-
-  delete applyBackgroundBtn.dataset.pendingValue;
-  delete applyBackgroundBtn.dataset.pendingName;
-
-  applyBackgroundBtn.textContent = '✔ Fond appliqué';
-  applyBackgroundBtn.disabled = true;
-
-  setTimeout(() => {
-    applyBackgroundBtn.classList.add('hidden');
-    applyBackgroundBtn.textContent = '✅ Appliquer ce fond';
-    applyBackgroundBtn.disabled = false;
-  }, 1500);
-
-  syncEditorDraftFromForm();
-});
-}
+    const val = applyBackgroundBtn.dataset.pendingValue ?? '';  // ← 4 espaces
+    const name = applyBackgroundBtn.dataset.pendingName || getBackgroundName(val);
+    setEditorBackground(val, name);
+    if (refs.backgroundPickerPanel) refs.backgroundPickerPanel.classList.add('hidden');
+    if (refs.backgroundToggleBtn) refs.backgroundToggleBtn.setAttribute('aria-expanded', 'false');
+    delete applyBackgroundBtn.dataset.pendingValue;
+    delete applyBackgroundBtn.dataset.pendingName;
+    applyBackgroundBtn.textContent = '✔ Fond appliqué';
+    applyBackgroundBtn.disabled = true;
+    setTimeout(() => {
+      applyBackgroundBtn.classList.add('hidden');
+      applyBackgroundBtn.textContent = '✅ Appliquer ce fond';
+      applyBackgroundBtn.disabled = false;
+    }, 1500);
+    syncEditorDraftFromForm();
+  });
+setEditorBackground — boucle for
+  if (panel) {
+    for (const button of panel.querySelectorAll('.background-option')) {
+      const isActive = button.dataset.background === normalizedValue;  // ← 6 espaces
+      button.classList.toggle('active', isActive);
+      button.classList.remove('pending');
+      button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    }  // ← 4 espaces
+  }
 
 function bindFiltersAndSearch() {
   if (document.body.dataset.filtersBound === 'true') {
