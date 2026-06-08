@@ -1,4 +1,4 @@
-notes-me-v11/
+note me/
   index.html
   manifest.webmanifest
   sw.js
@@ -17,21 +17,25 @@ notes-me-v11/
     img10.png
 
   css/
-    variables.css
+    auth.css
     base.css
-    layout.css
     components.css
-    notes.css
+    layout.css
     modals.css
+    notes.css
     responsive.css
+    variables.css
 
   js/
     app.js
+    auth.js
+    google-drive-sync.js
     state.js
 
     config/
-      constants.js
+      backgroundImages.js
       backgrounds.js
+      constants.js
 
     db/
       database.js
@@ -44,6 +48,7 @@ notes-me-v11/
     services/
       exportZip.js
       importZip.js
+      importZipUtils.js
       search.js
       storage.js
       history.js
@@ -80,3 +85,4 @@ notes-me-v11/
 
   package.json
   vitest.config.js
+  vite.config.js
