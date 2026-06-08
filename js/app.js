@@ -1239,13 +1239,16 @@ function bindEditor() {
 setEditorBackground — boucle for
   if (panel) {
     for (const button of panel.querySelectorAll('.background-option')) {
-      const isActive = button.dataset.background === normalizedValue;  // ← 6 espaces
+      const isActive = button.dataset.background === normalizedValue;
       button.classList.toggle('active', isActive);
       button.classList.remove('pending');
       button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
       button.setAttribute('aria-selected', isActive ? 'true' : 'false');
-    }  // ← 4 espaces
+    }
   }
+
+  updatePreview();
+}
 
 function bindFiltersAndSearch() {
   if (document.body.dataset.filtersBound === 'true') {
