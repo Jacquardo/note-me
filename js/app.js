@@ -32,6 +32,7 @@ import {
   clearGoogleDriveSession
 } from './google-drive-sync.js';
 
+
 const NOTE_BACKGROUNDS = [
   {
     name: 'Aucun fond',
@@ -39,10 +40,9 @@ const NOTE_BACKGROUNDS = [
   },
   ...Array.from({ length: 10 }, (_, index) => {
     const number = index + 1;
-
     return {
       name: `Fond ${number}`,
-      value: `./assets/img${number}.png`
+      value: `/assets/img${number}.png`  // ← / au lieu de ./
     };
   })
 ];
