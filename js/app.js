@@ -1584,11 +1584,11 @@ function syncEditorDraftFromForm() {
     category: refs.categoryInput?.value || '',
     tags: refs.tagsInput?.value || '',
     color: refs.colorInput?.value || refs.colorPaletteInput?.value || DEFAULT_SETTINGS.defaultNoteColor,
-    backgroundImage: refs.backgroundImageInput?.value || '',
+    // ✅ FIX : fallback sur le draft existant si l'input est absent
+    backgroundImage: refs.backgroundImageInput?.value || state.editorDraft?.backgroundImage || '',
     favorite: refs.favoriteInput?.value === 'true',
     content: refs.contentInput?.value || ''
   });
-
   updatePreview();
 }
 
