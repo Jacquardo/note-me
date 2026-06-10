@@ -24,6 +24,7 @@ import {
 } from './state.js';
 // ── Authentification Google ───────────────────────────────
 import { initAuth, signOut } from './auth.js';
+import { migrateBackgroundImagePaths } from './db/migrations.js';
 
 import {
   initGoogleDriveAuth,
@@ -42,7 +43,7 @@ const NOTE_BACKGROUNDS = [
     const number = index + 1;
     return {
       name: `Fond ${number}`,
-      value: `../assets/img${number}.png`  // ← / au lieu de ./
+      value: `/assets/img${number}.png`  // ← / au lieu de ./
     };
   })
 ];
@@ -349,18 +350,18 @@ async function loadNotes() {
     setSyncStatus('Chargement Google Drive...', 'syncing');
     showToast('Chargement des notes Google Drive...', 'info', { duration: 1800 });
 
-    const googleNotes = await loadNotesFromGoogleDrive();
-    const finalNotes = migrateBackgroundImagePaths(
+const googleNotes = await loadNotesFromGoogleDrive();
+
+// ✅ Une seule déclaration, avec migration intégrée
+let finalNotes = migrateBackgroundImagePaths(
   Array.isArray(googleNotes) ? googleNotes : []
 );
 
-    let finalNotes = Array.isArray(googleNotes) ? googleNotes : [];
-
-    if (finalNotes.length === 0 && localNotes.length > 0) {
-      finalNotes = localNotes;
-      await saveNotesToGoogleDrive(finalNotes);
-      showToast('Notes locales migrées vers Google Drive.', 'success');
-    }
+if (finalNotes.length === 0 && localNotes.length > 0) {
+  finalNotes = localNotes;
+  await saveNotesToGoogleDrive(finalNotes);
+  showToast('Notes locales migrées vers Google Drive.', 'success');
+}
 
     setState({
       notes: finalNotes,
