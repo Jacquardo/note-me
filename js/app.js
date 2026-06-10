@@ -43,7 +43,7 @@ const NOTE_BACKGROUNDS = [
     const number = index + 1;
     return {
       name: `Fond ${number}`,
-      value: `/assets/img${number}.png`  // ← / au lieu de ./
+      value: `../assets/img${number}.png`  // ← / au lieu de ./
     };
   })
 ];
