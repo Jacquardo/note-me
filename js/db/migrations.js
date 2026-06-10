@@ -71,6 +71,37 @@ function createSettingsStore(db) {
   }
 }
 
+/**
+ * Corrige les anciens chemins relatifs de backgroundImage.
+ * À appeler sur les notes après leur chargement (Google Drive ou IndexedDB).
+ * 
+ * Ancien : ./assets/img1.png
+ * Nouveau : /assets/img1.png
+ */
+export function migrateBackgroundImagePaths(notes = []) {
+  let migrated = 0;
+
+  const result = notes.map(note => {
+    if (
+      typeof note.backgroundImage === 'string' &&
+      note.backgroundImage.startsWith('./assets/img')
+    ) {
+      migrated++;
+      return {
+        ...note,
+        backgroundImage: note.backgroundImage.replace(/^\.\//, '/')
+      };
+    }
+    return note;
+  });
+
+  if (migrated > 0) {
+    console.info(`[Migration] ${migrated} note(s) avec backgroundImage corrigé(s).`);
+  }
+
+  return result;
+}
+
 function ensureRequiredStores(db) {
   if (!db.objectStoreNames.contains(STORES.NOTES)) {
     const notes = db.createObjectStore(STORES.NOTES, {
