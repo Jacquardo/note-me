@@ -82,16 +82,19 @@ export function migrateBackgroundImagePaths(notes = []) {
   let migrated = 0;
 
   const result = notes.map(note => {
+    const bg = note.backgroundImage;
+
     if (
-      typeof note.backgroundImage === 'string' &&
-      note.backgroundImage.startsWith('./assets/img')
+      typeof bg === 'string' && bg !== '' &&
+      (bg.startsWith('./assets/img') || bg.startsWith('../assets/img'))
     ) {
       migrated++;
       return {
         ...note,
-        backgroundImage: note.backgroundImage.replace(/^\.\//, '/')
+        backgroundImage: bg.replace(/^\.{1,2}\//, '/')  // ./  ou  ../  → /
       };
     }
+
     return note;
   });
 
