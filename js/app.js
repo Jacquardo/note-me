@@ -42,7 +42,7 @@ const NOTE_BACKGROUNDS = [
     const number = index + 1;
     return {
       name: `Fond ${number}`,
-      value: `/assets/img${number}.png`  // ← / au lieu de ./
+      value: `../assets/img${number}.png`  // ← / au lieu de ./
     };
   })
 ];
@@ -350,6 +350,9 @@ async function loadNotes() {
     showToast('Chargement des notes Google Drive...', 'info', { duration: 1800 });
 
     const googleNotes = await loadNotesFromGoogleDrive();
+    const finalNotes = migrateBackgroundImagePaths(
+  Array.isArray(googleNotes) ? googleNotes : []
+);
 
     let finalNotes = Array.isArray(googleNotes) ? googleNotes : [];
 
