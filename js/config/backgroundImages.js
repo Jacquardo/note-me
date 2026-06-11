@@ -46,18 +46,3 @@ export const BACKGROUND_IMAGES = [
     backgroundPosition: '0 0, 20px 20px'
   }
 ];
-
-export const NOTE_BACKGROUNDS = [
-  {
-    id: '',
-    name: 'Aucun fond',
-    thumbnail: '',
-    value: ''
-  },
-  ...Array.from({ length: 10 }, (_, i) => ({
-    id: `img${i + 1}`,
-    name: `Fond ${i + 1}`,
-    thumbnail: `/assets/img${i + 1}.png`,  // ← /assets/ absolu
-    value: `/assets/img${i + 1}.png`        // ← /assets/ absolu
-  }))
-];
