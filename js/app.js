@@ -25,6 +25,11 @@ import {
 // ── Authentification Google ───────────────────────────────
 import { initAuth, signOut } from './auth.js';
 import { migrateBackgroundImagePaths } from './db/migrations.js';
+// Ligne 27, après l'import de migrations.js, ajouter :
+import {
+  NOTE_BACKGROUNDS,
+  getBackgroundByValue
+} from './config/backgrounds.js';
 
 import {
   initGoogleDriveAuth,
@@ -32,21 +37,6 @@ import {
   saveNotesToGoogleDrive,
   clearGoogleDriveSession
 } from './google-drive-sync.js';
-
-
-const NOTE_BACKGROUNDS = [
-  {
-    name: 'Aucun fond',
-    value: ''
-  },
-  ...Array.from({ length: 10 }, (_, index) => {
-    const number = index + 1;
-    return {
-      name: `Fond ${number}`,
-      value: `/assets/img${number}.png`  // ← chemin absolu, cohérent avec la migration
-    };
-  })
-];
 
 const CONTINUOUS_SYNC_INTERVAL_MS = 45 * 1000;
 
@@ -1225,8 +1215,8 @@ function bindEditor() {
   const applyBackgroundBtn = refs.applyBackgroundBtn || document.getElementById('applyBackgroundBtn');
   applyBackgroundBtn?.addEventListener('click', () => {
     const val = applyBackgroundBtn.dataset.pendingValue ?? '';  // ← 4 espaces
-    const name = applyBackgroundBtn.dataset.pendingName || getBackgroundName(val);
-    setEditorBackground(val, name);
+    const name = applyBackgroundBtn.dataset.pendingName
+  || (getBackgroundByValue(val)?.name || 'Aucun fond')
     if (refs.backgroundPickerPanel) refs.backgroundPickerPanel.classList.add('hidden');
     if (refs.backgroundToggleBtn) refs.backgroundToggleBtn.setAttribute('aria-expanded', 'false');
     delete applyBackgroundBtn.dataset.pendingValue;
@@ -1455,14 +1445,16 @@ button.addEventListener('click', () => {
   }
 
   setEditorBackground(
-    refs.backgroundImageInput?.value || '',
-    getBackgroundName(refs.backgroundImageInput?.value || '')
-  );
+  refs.backgroundImageInput?.value || '',
+  getBackgroundByValue(refs.backgroundImageInput?.value || '')?.name || 'Aucun fond'
+);
 }
 
 function setEditorBackground(value = '', label = '') {
   const normalizedValue = String(value || '').trim();
-  const normalizedLabel = label || getBackgroundName(normalizedValue);
+  const normalizedLabel = label
+  || getBackgroundByValue(normalizedValue)?.name
+  || 'Aucun fond';
 
   if (refs.backgroundImageInput) {
     refs.backgroundImageInput.value = normalizedValue;
@@ -1488,20 +1480,6 @@ function setEditorBackground(value = '', label = '') {
     }                                                                   // ← 4 espaces
   }
   updatePreview();
-}
-
-function getBackgroundName(value = '') {
-  if (!value) {
-    return 'Aucun fond';
-  }
-
-  const match = String(value).match(/img(\d+)\.png$/i);
-
-  if (match) {
-    return `Fond ${match[1]}`;
-  }
-
-  return 'Fond personnalisé';
 }
 
 /**
