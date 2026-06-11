@@ -34,8 +34,6 @@ import {
 } from './google-drive-sync.js';
 
 
-// app.js
-
 const NOTE_BACKGROUNDS = [
   {
     name: 'Aucun fond',
