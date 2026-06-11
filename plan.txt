@@ -33,7 +33,6 @@ note me/
     state.js
 
     config/
-      backgroundImages.js
       backgrounds.js
       constants.js
 
