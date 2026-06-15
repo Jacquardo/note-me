@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v11.0.2'; // ← version incrémentée pour vider le cache stale
+const CACHE_VERSION = 'v11.0.3'; // ← version incrémentée pour vider le cache stale
 const CACHE_NAME = `notes-me-${CACHE_VERSION}`;
 
 const REQUIRED_ASSETS = [
@@ -19,7 +19,7 @@ const OPTIONAL_ASSETS = [
   'js/app.js',
   'js/state.js',
   'js/config/constants.js',
-  'js/config/backgrounds.js',   // ← plus de backgroundImages.js
+  'js/config/backgrounds.js',
   'js/db/database.js',
   'js/db/migrations.js',
   'js/db/notesRepository.js',
@@ -48,14 +48,14 @@ const OPTIONAL_ASSETS = [
   'js/utils/text.js',
   'vendor/sortable.min.js',
   'vendor/jszip.min.js',
-  '/assets/img1.png',   // ← slash initial ajouté pour cohérence
-  '/assets/img2.png',
-  '/assets/img3.png',
-  '/assets/img4.png',
-  '/assets/img5.png',
-  '/assets/img6.png',
-  '/assets/img7.png',
-  '/assets/img8.png',
-  '/assets/img9.png',
-  '/assets/img10.png'
+  'assets/img1.png',   // ← sans slash, relatif au scope du SW
+  'assets/img2.png',
+  'assets/img3.png',
+  'assets/img4.png',
+  'assets/img5.png',
+  'assets/img6.png',
+  'assets/img7.png',
+  'assets/img8.png',
+  'assets/img9.png',
+  'assets/img10.png'
 ];
