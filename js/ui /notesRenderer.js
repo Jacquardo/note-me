@@ -135,7 +135,7 @@ function createNoteBadges(note) {
   if (note.favorite) badges.appendChild(createBadge('⭐ Favori'));
   if (note.category) badges.appendChild(createBadge(note.category));
   for (const tag of note.tags || []) {
-    badges.appendChild(createBadge(`#${tag}`));
+    badges.appendChild(createBadge(`#${tag}`));  // ← parenthèses correctes
   }
   if (note.fileId || note.fileName) badges.appendChild(createBadge(getFileBadgeText(note)));
   if (note.deletedAt) badges.appendChild(createBadge('🗑️ Corbeille'));
