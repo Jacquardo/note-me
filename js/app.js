@@ -1213,23 +1213,26 @@ function bindEditor() {
   
  
   const applyBackgroundBtn = refs.applyBackgroundBtn || document.getElementById('applyBackgroundBtn');
-  applyBackgroundBtn?.addEventListener('click', () => {
-    const val = applyBackgroundBtn.dataset.pendingValue ?? '';  // ← 4 espaces
-    const name = applyBackgroundBtn.dataset.pendingName
-  || (getBackgroundByValue(val)?.name || 'Aucun fond')
-    if (refs.backgroundPickerPanel) refs.backgroundPickerPanel.classList.add('hidden');
-    if (refs.backgroundToggleBtn) refs.backgroundToggleBtn.setAttribute('aria-expanded', 'false');
-    delete applyBackgroundBtn.dataset.pendingValue;
-    delete applyBackgroundBtn.dataset.pendingName;
-    applyBackgroundBtn.textContent = '✔ Fond appliqué';
-    applyBackgroundBtn.disabled = true;
-    setTimeout(() => {
-      applyBackgroundBtn.classList.add('hidden');
-      applyBackgroundBtn.textContent = '✅ Appliquer ce fond';
-      applyBackgroundBtn.disabled = false;
-    }, 1500);
-    syncEditorDraftFromForm();
-  });
+applyBackgroundBtn?.addEventListener('click', () => {
+  const val = applyBackgroundBtn.dataset.pendingValue ?? '';
+  const name = applyBackgroundBtn.dataset.pendingName
+    || (getBackgroundByValue(val)?.name || 'Aucun fond');
+
+  setEditorBackground(val, name); // ← ligne ajoutée : met à jour backgroundImageInput
+
+  if (refs.backgroundPickerPanel) refs.backgroundPickerPanel.classList.add('hidden');
+  if (refs.backgroundToggleBtn) refs.backgroundToggleBtn.setAttribute('aria-expanded', 'false');
+  delete applyBackgroundBtn.dataset.pendingValue;
+  delete applyBackgroundBtn.dataset.pendingName;
+  applyBackgroundBtn.textContent = '✔ Fond appliqué';
+  applyBackgroundBtn.disabled = true;
+  setTimeout(() => {
+    applyBackgroundBtn.classList.add('hidden');
+    applyBackgroundBtn.textContent = '✅ Appliquer ce fond';
+    applyBackgroundBtn.disabled = false;
+  }, 1500);
+  syncEditorDraftFromForm(); // ← lit maintenant la bonne valeur depuis backgroundImageInput
+});
 } 
 
 function bindFiltersAndSearch() {
@@ -1498,7 +1501,7 @@ function setPendingBackground(value = '', name = '') {
   const applyBtn = refs.applyBackgroundBtn || document.getElementById('applyBackgroundBtn');
   if (applyBtn) {
     applyBtn.dataset.pendingValue = value;
-    applyBtn.dataset.pendingName = name || getBackgroundName(value);
+    applyBtn.dataset.pendingName = name || getBackgroundByValue(value)?.name || 'Aucun fond'; // ← fix
     applyBtn.classList.remove('hidden');
     applyBtn.textContent = '✅ Appliquer ce fond';
     applyBtn.disabled = false;
