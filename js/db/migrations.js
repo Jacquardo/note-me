@@ -53,26 +53,35 @@ function createSettingsStore(db) {
 
 export function migrateBackgroundImagePaths(notes = []) {
   let migrated = 0;
+
   const result = notes.map(note => {
     const bg = note.backgroundImage;
+
     if (
       typeof bg === 'string' && bg !== '' &&
       (
         bg.startsWith('./assets/img') ||
         bg.startsWith('../assets/img') ||
-        (bg.startsWith('assets/img') && !bg.startsWith('/assets/img'))
+        bg.startsWith('/assets/img')  // ← était normalisé en /assets/ par erreur
       )
     ) {
       migrated++;
-      return { ...note, backgroundImage: bg.replace(/^(\.{1,2}\/)?/, '/') };
+      return {
+        ...note,
+        backgroundImage: bg.replace(/^(?:\.{1,2}\/|\/)/, '')  // → assets/imgX.png
+      };
     }
+
     return note;
   });
+
   if (migrated > 0) {
     console.info(`[Migration] ${migrated} note(s) avec backgroundImage corrigé(s).`);
   }
+
   return result;
 }
+
 
 function ensureRequiredStores(db) {
   if (!db.objectStoreNames.contains(STORES.NOTES)) {
