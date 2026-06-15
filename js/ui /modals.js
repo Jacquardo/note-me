@@ -9,69 +9,53 @@ let lastFocusedElement = null;
 
 export function openModal(modal, focusTarget = null) {
   if (!modal) return false;
-
   if (!activeModalStack.length) {
     lastFocusedElement = document.activeElement;
   }
-
   modal.classList.add('open');
   modal.setAttribute('aria-hidden', 'false');
   document.body.classList.add('modal-open');
-
   if (!activeModalStack.includes(modal)) {
     activeModalStack.push(modal);
   }
-
   const target =
     focusTarget ||
     modal.querySelector('[autofocus]') ||
     getFocusableElements(modal)[0] ||
     modal;
-
   if (!modal.hasAttribute('tabindex')) {
     modal.setAttribute('tabindex', '-1');
   }
-
   safeFocus(target);
-
   return true;
 }
 
 export function closeModal(modal) {
   if (!modal) return false;
-
   modal.classList.remove('open');
   modal.setAttribute('aria-hidden', 'true');
-
   activeModalStack = activeModalStack.filter((item) => item !== modal);
-
   if (!activeModalStack.length) {
     document.body.classList.remove('modal-open');
-
     if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
       safeFocus(lastFocusedElement);
     }
-
     lastFocusedElement = null;
   } else {
     const topModal = activeModalStack[activeModalStack.length - 1];
     safeFocus(getFocusableElements(topModal)[0] || topModal);
   }
-
   return true;
 }
 
 export function closeTopModal() {
   const modal = activeModalStack[activeModalStack.length - 1];
-
   if (!modal) return false;
-
   return closeModal(modal);
 }
 
 export function closeAllModals() {
   const modals = [...activeModalStack];
-
   for (const modal of modals.reverse()) {
     closeModal(modal);
   }
@@ -88,15 +72,12 @@ export function isModalOpen(modal) {
 export function bindModalSystem(root = document) {
   root.addEventListener('keydown', (event) => {
     const topModal = getTopModal();
-
     if (!topModal) return;
-
     if (event.key === 'Escape') {
       event.preventDefault();
       closeTopModal();
       return;
     }
-
     trapFocus(topModal, event);
   });
 
@@ -104,9 +85,7 @@ export function bindModalSystem(root = document) {
     const modal = event.target instanceof Element
       ? event.target.closest('.modal.open')
       : null;
-
     if (!modal) return;
-
     if (event.target === modal) {
       closeModal(modal);
     }
@@ -115,7 +94,6 @@ export function bindModalSystem(root = document) {
 
 export function bindCloseButton(button, modal) {
   if (!button || !modal) return;
-
   button.addEventListener('click', () => {
     closeModal(modal);
   });
@@ -138,7 +116,6 @@ export function createConfirmDialog({
     if (!modal || !okButton || !cancelButton) {
       return Promise.resolve(window.confirm(message));
     }
-
     titleElement.textContent = title;
     messageElement.textContent = message;
     okButton.textContent = okText;
@@ -152,20 +129,10 @@ export function createConfirmDialog({
         cancelButton.removeEventListener('click', onCancel);
         closeModal(modal);
       };
-
-      const onOk = () => {
-        cleanup();
-        resolve(true);
-      };
-
-      const onCancel = () => {
-        cleanup();
-        resolve(false);
-      };
-
+      const onOk = () => { cleanup(); resolve(true); };
+      const onCancel = () => { cleanup(); resolve(false); };
       okButton.addEventListener('click', onOk);
       cancelButton.addEventListener('click', onCancel);
-
       openModal(modal, cancelButton);
     });
   };
