@@ -43,37 +43,28 @@ export const DEFAULT_SETTINGS = {
 
 export const state = {
   appVersion: APP_VERSION,
-
   db: null,
   modules: {},
-
   notes: [],
   filteredNotes: [],
   renderedOffset: 0,
   hasMoreNotes: false,
-
   currentView: 'active',
   activeFilter: FILTERS.ALL,
   searchQuery: '',
   categoryFilter: '',
   sortMode: SORT_MODES.RECENT,
   viewMode: VIEW_MODES.CARDS,
-
-  settings: {
-    ...DEFAULT_SETTINGS
-  },
-
+  settings: { ...DEFAULT_SETTINGS },
   isReady: false,
   isLoading: false,
   isSaving: false,
   isMenuOpen: false,
-
   editingNoteId: null,
   viewingNoteId: null,
   selectedFile: null,
   selectedFileRecord: null,
   activeObjectUrls: new Set(),
-
   editorDraft: {
     title: '',
     category: '',
@@ -87,12 +78,10 @@ export const state = {
     fileType: '',
     fileSize: 0
   },
-
   pagination: {
     pageSize: DEFAULT_SETTINGS.pageSize,
     offset: 0
   },
-
   lastFocusedElement: null
 };
 
@@ -100,100 +89,26 @@ export const refs = {};
 
 export function hydrateRefs() {
   const ids = [
-    'app',
-    'mainContent',
-
-    'menuToggleBtn',
-    'topNavMenu',
-
-    'openBtn',
-    'exportZipBtn',
-    'importZipBtn',
-    'importZipInput',
-    'installAppBtn',
-    'toggleTrashViewBtn',
-    'emptyTrashBtn',
-    'settingsBtn',
-    'themeToggleBtn',
-    'helpBtn',
-
-    'searchInput',
-    'categoryFilter',
-    'sortSelect',
-    'viewModeSelect',
-
-    'filterAllBtn',
-    'filterFavBtn',
-    'filterWithFileBtn',
-    'filterRecentBtn',
-
-    'activeCount',
-    'favoriteCount',
-    'trashCount',
-    'listTitle',
-    'viewBadge',
-    'list',
-    'loadMoreBtn',
-
-    'toastRegion',
-
-    'noteModal',
-    'closeNoteModalBtn',
-    'noteModalContent',
-    'noteModalTitle',
-
-    'editorModal',
-    'closeEditorModalBtn',
-    'editorModalTitle',
-    'emojiToggleBtn',
-    'emojiPanel',
-    'attachBtn',
-    'fileInput',
-    'titleInput',
-    'categoryInput',
-    'categorySuggestions',
-    'tagsInput',
-    'colorPaletteInput',
-    'colorInput',
-    'activeColorPreview',
-    'activeColorCode',
-    'colorPicker',
-    'backgroundToggleBtn',
-    'activeBackgroundName',
-    'backgroundImageInput',
-    'backgroundPickerPanel',
-    'favoriteToggleBtn',
-    'favoriteInput',
-    'contentInput',
-    'attachmentInfo',
-    'attachmentName',
-    'removeFileBtn',
-    'notePreview',
-    'cancelEditBtn',
-    'saveNoteBtn',
-
-    'imageModal',
-    'closeImageModalBtn',
-    'downloadImageBtn',
-    'imageViewer',
-
-    'settingsModal',
-    'closeSettingsModalBtn',
-    'defaultViewModeSelect',
-    'pageSizeInput',
-    'confirmBeforeDeleteInput',
-    'compactAnimationsInput',
-    'resetSettingsBtn',
-    'saveSettingsBtn',
-
-    'helpModal',
-    'closeHelpModalBtn',
-
-    'confirmModal',
-    'confirmTitle',
-    'confirmMessage',
-    'confirmCancelBtn',
-    'confirmOkBtn'
+    'app', 'mainContent', 'menuToggleBtn', 'topNavMenu', 'openBtn',
+    'exportZipBtn', 'importZipBtn', 'importZipInput', 'installAppBtn',
+    'toggleTrashViewBtn', 'emptyTrashBtn', 'settingsBtn', 'themeToggleBtn',
+    'helpBtn', 'searchInput', 'categoryFilter', 'sortSelect', 'viewModeSelect',
+    'filterAllBtn', 'filterFavBtn', 'filterWithFileBtn', 'filterRecentBtn',
+    'activeCount', 'favoriteCount', 'trashCount', 'listTitle', 'viewBadge',
+    'list', 'loadMoreBtn', 'toastRegion', 'noteModal', 'closeNoteModalBtn',
+    'noteModalContent', 'noteModalTitle', 'editorModal', 'closeEditorModalBtn',
+    'editorModalTitle', 'emojiToggleBtn', 'emojiPanel', 'attachBtn', 'fileInput',
+    'titleInput', 'categoryInput', 'categorySuggestions', 'tagsInput',
+    'colorPaletteInput', 'colorInput', 'activeColorPreview', 'activeColorCode',
+    'colorPicker', 'backgroundToggleBtn', 'activeBackgroundName',
+    'backgroundImageInput', 'backgroundPickerPanel', 'favoriteToggleBtn',
+    'favoriteInput', 'contentInput', 'attachmentInfo', 'attachmentName',
+    'removeFileBtn', 'notePreview', 'cancelEditBtn', 'saveNoteBtn',
+    'imageModal', 'closeImageModalBtn', 'downloadImageBtn', 'imageViewer',
+    'settingsModal', 'closeSettingsModalBtn', 'defaultViewModeSelect',
+    'pageSizeInput', 'confirmBeforeDeleteInput', 'compactAnimationsInput',
+    'resetSettingsBtn', 'saveSettingsBtn', 'helpModal', 'closeHelpModalBtn',
+    'confirmModal', 'confirmTitle', 'confirmMessage', 'confirmCancelBtn', 'confirmOkBtn'
   ];
 
   for (const id of ids) {
@@ -218,11 +133,7 @@ export function setState(partialState = {}) {
 }
 
 export function setSettings(partialSettings = {}) {
-  state.settings = {
-    ...state.settings,
-    ...partialSettings
-  };
-
+  state.settings = { ...state.settings, ...partialSettings };
   return state.settings;
 }
 
@@ -230,7 +141,6 @@ export function resetEditorDraft() {
   state.editingNoteId = null;
   state.selectedFile = null;
   state.selectedFileRecord = null;
-
   state.editorDraft = {
     title: '',
     category: '',
@@ -244,16 +154,11 @@ export function resetEditorDraft() {
     fileType: '',
     fileSize: 0
   };
-
   return state.editorDraft;
 }
 
 export function setEditorDraft(partialDraft = {}) {
-  state.editorDraft = {
-    ...state.editorDraft,
-    ...partialDraft
-  };
-
+  state.editorDraft = { ...state.editorDraft, ...partialDraft };
   return state.editorDraft;
 }
 
@@ -261,21 +166,16 @@ export function revokeObjectUrls() {
   for (const url of state.activeObjectUrls) {
     URL.revokeObjectURL(url);
   }
-
   state.activeObjectUrls.clear();
 }
 
 export function registerObjectUrl(url) {
-  if (url) {
-    state.activeObjectUrls.add(url);
-  }
-
+  if (url) state.activeObjectUrls.add(url);
   return url;
 }
 
 export function unregisterObjectUrl(url) {
   if (!url) return;
-
   URL.revokeObjectURL(url);
   state.activeObjectUrls.delete(url);
 }
@@ -302,22 +202,18 @@ export function getNoteById(noteId) {
 
 export function upsertNoteInState(note) {
   if (!note || !note.id) return state.notes;
-
   const index = state.notes.findIndex((item) => item.id === note.id);
-
   if (index >= 0) {
     state.notes[index] = note;
   } else {
     state.notes.unshift(note);
   }
-
   return state.notes;
 }
 
 export function removeNoteFromState(noteId) {
   state.notes = state.notes.filter((note) => note.id !== noteId);
   state.filteredNotes = state.filteredNotes.filter((note) => note.id !== noteId);
-
   return state.notes;
 }
 
@@ -339,15 +235,12 @@ export function getCurrentTheme() {
 
 export function setCurrentTheme(theme) {
   const normalizedTheme = theme === 'light' ? 'light' : 'dark';
-
   document.documentElement.setAttribute('data-theme', normalizedTheme);
   state.settings.theme = normalizedTheme;
-
   try {
     localStorage.setItem(STORAGE_KEYS.THEME, normalizedTheme);
   } catch (error) {
     console.warn('Impossible de sauvegarder le thème dans localStorage.', error);
   }
-
   return normalizedTheme;
 }
