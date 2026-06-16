@@ -230,17 +230,26 @@ function applyNoteStyle(item, note) {
 
 function applyNoteBackgroundToElement(item, note) {
   const backgroundValue = String(note.backgroundImage || '').trim();
+
   if (!backgroundValue) {
     item.style.removeProperty('--note-image-url');
     item.classList.remove('has-background-image');
     return;
   }
+
   const safeValue = cssEscapeUrl(backgroundValue);
+
+  let imageValue;
   if (safeValue.startsWith('linear-gradient') || safeValue.startsWith('radial-gradient')) {
-    item.style.setProperty('--note-image-url', safeValue);
+    imageValue = safeValue;
   } else {
-    item.style.setProperty('--note-image-url', `url("${safeValue}")`);
+    // URL absolue pour éviter la résolution relative à css/notes.css
+    const anchor = document.createElement('a');
+    anchor.href = safeValue;
+    imageValue = `url("${anchor.href}")`;
   }
+
+  item.style.setProperty('--note-image-url', imageValue);
   item.classList.add('has-background-image');
 }
 
