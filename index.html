@@ -84,13 +84,21 @@
 
   <div id="app" class="app-shell" aria-hidden="true">
     <header class="title-container" role="banner">
-      <div class="brand-block">
-        <img src="./assets/logo.png" alt="Logo Notes Me" width="56" height="56">
-        <div class="brand-text">
-          <h1 class="title">Notes Me</h1>
-          <p class="subtitle">Dashboard de notes synchronisées</p>
-        </div>
-      </div>
+
+  <!-- Bloc marque (inchangé) -->
+  <div class="brand-block">
+    <img src="./assets/logo.png" alt="Logo Notes Me" width="56" height="56">
+    <div class="brand-text">
+      <h1 class="title">Notes Me</h1>
+      <p class="subtitle">Dashboard de notes synchronisées</p>
+    </div>
+  </div>
+
+  <!-- Côté droit : groupe nav + compte + sous-ligne -->
+  <div class="header-right">
+
+    <!-- Ligne principale : hamburger + avatar/compte -->
+    <div class="header-nav-group">
 
       <nav class="top-nav" aria-label="Menu principal">
         <button
@@ -109,34 +117,12 @@
             ➕ Nouvelle note
           </button>
 
-          <button id="exportZipBtn" class="nav-menu-btn btn btn-secondary" type="button">
-            📦 Export ZIP
-          </button>
-
-          <button id="importZipBtn" class="nav-menu-btn btn btn-secondary" type="button">
-            📥 Import ZIP
-          </button>
-
-          <input id="importZipInput" type="file" accept=".zip,application/zip,application/x-zip-compressed" hidden>
-
           <button id="installAppBtn" class="nav-menu-btn btn btn-secondary" type="button" hidden>
             📲 Installer l'application
           </button>
 
-          <button id="toggleTrashViewBtn" class="nav-menu-btn btn btn-secondary" type="button">
-            🗑️ Voir la corbeille
-          </button>
-
-          <button id="emptyTrashBtn" class="nav-menu-btn btn btn-danger" type="button">
-            🧹 Vider la corbeille
-          </button>
-
           <button id="settingsBtn" class="nav-menu-btn btn btn-secondary" type="button">
             ⚙️ Paramètres
-          </button>
-
-          <button id="themeToggleBtn" class="nav-menu-btn btn btn-secondary" type="button">
-            🌙 Thème sombre
           </button>
 
           <button id="helpBtn" class="nav-menu-btn btn btn-secondary" type="button">
@@ -149,16 +135,28 @@
         </div>
       </nav>
 
-      <!-- Infos utilisateur connecté -->
+      <!-- Avatar utilisateur (visible après connexion) -->
       <div id="userInfoBlock" class="user-info-block" hidden>
         <img id="userAvatar" class="user-avatar" src="" alt="Avatar utilisateur">
         <span id="userDisplayName" class="user-display-name"></span>
       </div>
 
+    </div>
+
+    <!-- Sous-ligne : statut sync + toggle thème -->
+    <div class="header-sub-row">
       <div id="syncStatusBlock" class="sync-status-block" hidden>
         <span id="syncStatusText">Non synchronisé</span>
       </div>
-    </header>
+
+      <button id="themeToggleBtn" class="btn btn-secondary theme-pill-btn" type="button" aria-label="Changer le thème">
+        🌙
+      </button>
+    </div>
+
+  </div>
+</header>
+    
 
     <main id="mainContent" class="main-content" role="main" tabindex="-1">
       <section class="topbar" aria-label="Contrôles et filtres">
@@ -521,6 +519,27 @@
           <input id="compactAnimationsInput" type="checkbox">
           <span>Réduire les animations</span>
         </label>
+      </div>
+      <!-- Section Actions déplacées ici depuis le menu principal -->
+      <h3 class="settings-section-title">Actions</h3>
+      <div class="settings-actions-grid">
+        <button id="exportZipBtn" class="btn btn-secondary" type="button">
+          📦 Export ZIP
+        </button>
+
+        <button id="importZipBtn" class="btn btn-secondary" type="button">
+          📥 Import ZIP
+        </button>
+
+        <input id="importZipInput" type="file" accept=".zip,application/zip,application/x-zip-compressed" hidden>
+
+        <button id="toggleTrashViewBtn" class="btn btn-secondary" type="button">
+          🗑️ Voir la corbeille
+        </button>
+
+        <button id="emptyTrashBtn" class="btn btn-danger" type="button">
+          🧹 Vider la corbeille
+        </button>
       </div>
 
       <div class="editor-actions">
