@@ -189,49 +189,54 @@
   color: #ff6b6b;
 }
 
-/* ─────────────────────────────────────────────────────────────
-   Informations utilisateur dans le header
-───────────────────────────────────────────────────────────── */
+/* ── Informations utilisateur dans le header ─────────── */
 
 .user-info-block {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-
-  min-height: 40px;
-  padding: 0.25rem 0.5rem;
-
-  border: 1px solid var(--border, #1e3a5f);
-  border-radius: 2rem;
-
-  background: var(--bg-card, #0f1f33);
+  gap: 8px;
+  padding: 4px 8px 4px 4px;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background: transparent;
+  transition:
+    border-color var(--transition-normal),
+    box-shadow var(--transition-normal);
 }
 
 .user-info-block[hidden] {
   display: none;
 }
 
+/* Anneau vert quand les notes sont synchronisées */
+.header-right:has(#syncStatusBlock[data-status="success"]) #userInfoBlock {
+  border-color: var(--accent-success);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.18);
+}
+
 .user-avatar {
-  width: 32px;
-  height: 32px;
-
+  width: 34px;
+  height: 34px;
   flex: 0 0 auto;
-
   object-fit: cover;
-  border: 2px solid var(--accent, #4da6e8);
   border-radius: 50%;
+  border: none;
 }
 
 .user-display-name {
-  max-width: 120px;
-
+  max-width: 110px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+}
 
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-primary, #e8f4fd);
+@media (max-width: 600px) {
+  .user-display-name {
+    display: none;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────
