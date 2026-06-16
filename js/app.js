@@ -816,12 +816,17 @@ function applyNoteBackgroundToElement(element, note) {
 
   const safeValue = backgroundValue.replace(/["\\]/g, '');
 
+  let imageValue;
   if (safeValue.startsWith('linear-gradient') || safeValue.startsWith('radial-gradient')) {
-    element.style.setProperty('--note-image-url', safeValue);
+    imageValue = safeValue;
   } else {
-    element.style.setProperty('--note-image-url', `url("${safeValue}")`);
+    // Résoudre en URL absolue pour éviter l'ambiguïté de résolution dans notes.css
+    const anchor = document.createElement('a');
+    anchor.href = safeValue;
+    imageValue = `url("${anchor.href}")`;
   }
 
+  element.style.setProperty('--note-image-url', imageValue);
   element.classList.add('has-background-image');
 }
 
