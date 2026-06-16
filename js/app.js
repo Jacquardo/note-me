@@ -1124,6 +1124,7 @@ function applyTheme(theme) {
   if (metaTheme) {
     metaTheme.setAttribute('content', appliedTheme === 'dark' ? '#07111f' : '#edf4fb');
   }
+}                          // ← accolade fermante manquante à ajouter
 
 function bindBasicModalButtons() {
   if (document.body.dataset.basicButtonsBound === 'true') {
