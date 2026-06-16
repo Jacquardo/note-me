@@ -1,13 +1,12 @@
 /* css/responsive.css */
-/* Correctifs tablette, Android et petits écrans */
 
 /* ─────────────────────────────────────────────────────────────
    Tablettes et mobiles
 ───────────────────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
-  html,
-  body {
+
+  html, body {
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
@@ -19,31 +18,28 @@
     overflow: visible;
   }
 
-  /* Header mobile */
+  /* ── Header mobile ─────────────────────────────────────── */
+
   .title-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-
-    width: 100%;
-    padding: 0.9rem;
-
-    border-radius: 1.4rem;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 16px;
   }
 
   .brand-block {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
+    display: flex;
     align-items: center;
-    gap: 0.75rem;
-
-    width: 100%;
+    gap: 10px;
+    flex: 1 1 auto;
     min-width: 0;
   }
 
   .brand-block img {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     flex: 0 0 auto;
   }
 
@@ -53,82 +49,94 @@
   }
 
   .title {
-    max-width: 100%;
-
+    font-size: 1.2rem;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
-
-    font-size: 1.35rem;
-    line-height: 1.15;
   }
 
   .subtitle {
-    max-width: 100%;
-
+    font-size: 0.75rem;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
-
-    font-size: 0.82rem;
-    line-height: 1.3;
   }
 
-  /* Navigation */
-  .top-nav {
-    width: 100%;
+  /* ── Header right (nouveau) ────────────────────────────── */
+
+  .header-right {
+    flex: 0 0 auto;
+    min-width: unset;
+    width: auto;
+    gap: 6px;
   }
+
+  .header-nav-group {
+    padding: 6px 8px;
+    gap: 8px;
+    border-radius: 14px;
+  }
+
+  .header-sub-row {
+    gap: 8px;
+    padding: 2px 4px;
+  }
+
+  .header-sub-row #syncStatusBlock {
+    font-size: 11px;
+  }
+
+  /* ── Menu toggle ───────────────────────────────────────── */
 
   .menu-toggle-btn {
-    width: 100%;
-    min-height: 48px;
-    justify-content: center;
-    font-size: 1.45rem;
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
+    min-height: 38px;
+    padding: 0;
+    font-size: 1.15rem;
+    border-radius: 12px;
   }
 
   .top-nav-menu {
-    width: 100%;
-    max-width: 100%;
+    min-width: 220px;
   }
 
   .top-nav-menu.open {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
+    display: flex;
   }
 
   .nav-menu-btn {
     width: 100%;
     min-height: 44px;
-    justify-content: center;
+    justify-content: flex-start;
     white-space: normal;
   }
 
-  /* Infos utilisateur et statut synchro */
-  .user-info-block {
-    width: 100%;
-    min-height: 44px;
-    justify-content: center;
+  /* ── Toggle thème ──────────────────────────────────────── */
+
+  .theme-pill-btn {
+    min-height: 28px;
+    height: 28px;
+    min-width: 28px;
+    width: 28px;
+    font-size: 13px;
   }
 
+  /* ── Avatar utilisateur ────────────────────────────────── */
+
   .user-avatar {
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
   }
 
   .user-display-name {
-    max-width: 190px;
+    max-width: 80px;
+    font-size: 12px;
   }
 
-  .sync-status-block {
-    width: 100%;
-    min-height: 40px;
-    justify-content: center;
-    text-align: center;
-    line-height: 1.25;
-  }
+  /* ── Contenu principal ─────────────────────────────────── */
 
-  /* Contenu principal */
   .main-content {
     width: 100%;
     padding: 0;
@@ -138,10 +146,8 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 0.85rem;
-
     width: 100%;
     padding: 0.9rem;
-
     border-radius: 1.4rem;
   }
 
@@ -149,7 +155,6 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 0.65rem;
-
     width: 100%;
   }
 
@@ -170,15 +175,14 @@
     border-radius: 1rem;
   }
 
-  /* Filtres rapides */
+  /* ── Filtres rapides ───────────────────────────────────── */
+
   .filters-bar {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.55rem;
-
     width: 100%;
     padding: 0.9rem;
-
     border-radius: 1.4rem;
   }
 
@@ -190,12 +194,12 @@
     white-space: nowrap;
   }
 
-  /* Stats */
+  /* ── Stats ─────────────────────────────────────────────── */
+
   .stats {
     display: grid;
     grid-template-columns: 1fr;
     gap: 0.65rem;
-
     width: 100%;
   }
 
@@ -203,39 +207,30 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     min-width: 0;
     padding: 0.8rem 1rem;
     border-radius: 1rem;
-
     text-align: left;
   }
 
-  .stat-label {
-    font-size: 0.9rem;
-  }
+  .stat-label { font-size: 0.9rem; }
+  .stat-value { font-size: 1.45rem; line-height: 1; }
 
-  .stat-value {
-    font-size: 1.45rem;
-    line-height: 1;
-  }
+  /* ── En-tête de liste ──────────────────────────────────── */
 
-  /* En-tête de liste */
   .list-header {
     display: grid;
     grid-template-columns: 1fr;
     gap: 0.45rem;
-
     padding: 0.85rem;
     border-radius: 1.3rem;
   }
 
   .section-label,
-  .view-badge {
-    text-align: center;
-  }
+  .view-badge { text-align: center; }
 
-  /* Liste des notes */
+  /* ── Notes ─────────────────────────────────────────────── */
+
   .notes-list {
     width: 100%;
     padding: 0.75rem;
@@ -246,14 +241,10 @@
     max-width: 100%;
   }
 
-  .note-head {
-    gap: 0.5rem;
-  }
+  .note-head { gap: 0.5rem; }
 
   .note-title,
-  .note-content {
-    overflow-wrap: anywhere;
-  }
+  .note-content { overflow-wrap: anywhere; }
 
   .note-actions {
     flex-wrap: wrap;
@@ -265,20 +256,18 @@
     min-height: 38px;
   }
 
-  /* Bouton charger plus */
-  .load-more-wrapper {
-    padding: 0.75rem;
-  }
+  /* ── Charger plus ──────────────────────────────────────── */
+
+  .load-more-wrapper { padding: 0.75rem; }
 
   #loadMoreBtn {
     width: 100%;
     min-height: 44px;
   }
 
-  /* Modales */
-  .modal {
-    padding: 0.75rem;
-  }
+  /* ── Modales ────────────────────────────────────────────── */
+
+  .modal { padding: 0.75rem; }
 
   .modal-card {
     width: 100%;
@@ -288,9 +277,7 @@
     border-radius: 1.25rem;
   }
 
-  .editor-card {
-    width: 100%;
-  }
+  .editor-card { width: 100%; }
 
   .editor-header {
     display: grid;
@@ -334,9 +321,7 @@
     min-height: 44px;
   }
 
-  textarea {
-    min-height: 160px;
-  }
+  textarea { min-height: 160px; }
 
   .attachment-info {
     flex-wrap: wrap;
@@ -348,7 +333,14 @@
     overflow-wrap: anywhere;
   }
 
-  /* Emoji */
+  /* ── Paramètres actions grid ───────────────────────────── */
+
+  .settings-actions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* ── Emoji ─────────────────────────────────────────────── */
+
   .emoji-tabs {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -361,64 +353,67 @@
     gap: 0.4rem;
   }
 
-  .emoji-btn {
-    min-height: 40px;
-  }
+  .emoji-btn { min-height: 40px; }
 }
 
 /* ─────────────────────────────────────────────────────────────
-   Petits mobiles Android
+   Petits mobiles (≤ 520px)
 ───────────────────────────────────────────────────────────── */
 
 @media (max-width: 520px) {
+
   .title-container {
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 0.65rem;
+    gap: 8px;
+    padding: 8px 10px;
   }
 
-  .brand-block {
-    grid-column: 1 / 3;
-    grid-template-columns: auto 1fr;
+  .brand-block img {
+    width: 40px;
+    height: 40px;
   }
 
-  .top-nav {
-    grid-column: 3 / 4;
-    width: auto;
+  .title { font-size: 1.05rem; }
+  .subtitle { font-size: 0.72rem; }
+
+  .header-nav-group {
+    padding: 5px 7px;
+    gap: 6px;
   }
 
   .menu-toggle-btn {
-    width: 54px;
-    min-width: 54px;
-    height: 54px;
-    padding: 0;
-    border-radius: 1rem;
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+    min-height: 34px;
+    font-size: 1rem;
   }
 
-  .top-nav-menu {
-    grid-column: 1 / -1;
+  .user-avatar {
+    width: 28px;
+    height: 28px;
   }
 
-  .user-info-block {
-    grid-column: 1 / 2;
-    width: auto;
-    justify-content: center;
+  .user-display-name { display: none; }
+
+  .header-sub-row #syncStatusBlock {
+    font-size: 10px;
   }
 
-  .sync-status-block {
-    grid-column: 2 / -1;
-    width: 100%;
-    justify-content: flex-start;
-    padding-left: 0.8rem;
-    text-align: left;
+  .theme-pill-btn {
+    min-height: 26px;
+    height: 26px;
+    min-width: 26px;
+    width: 26px;
+    font-size: 12px;
   }
 }
 
 /* ─────────────────────────────────────────────────────────────
-   Très petits écrans
+   Très petits écrans (≤ 420px)
 ───────────────────────────────────────────────────────────── */
 
 @media (max-width: 420px) {
+
   .title-container,
   .topbar,
   .filters-bar,
@@ -428,38 +423,18 @@
   }
 
   .brand-block img {
-    width: 44px;
-    height: 44px;
+    width: 36px;
+    height: 36px;
   }
 
-  .title {
-    font-size: 1.18rem;
-  }
-
-  .subtitle {
-    font-size: 0.76rem;
-  }
-
-  .user-avatar {
-    width: 34px;
-    height: 34px;
-  }
-
-  .user-display-name {
-    display: none;
-  }
-
-  .sync-status-block {
-    font-size: 0.78rem;
-  }
+  .title { font-size: 0.95rem; }
+  .subtitle { font-size: 0.7rem; }
 
   .filters-bar {
     grid-template-columns: 1fr;
   }
 
-  .filter-chip {
-    white-space: normal;
-  }
+  .filter-chip { white-space: normal; }
 
   .editor-header-actions {
     grid-template-columns: 1fr;
@@ -479,7 +454,6 @@
     .login-overlay {
       min-height: 100dvh;
     }
-
     .modal-card {
       max-height: calc(100dvh - 1.5rem);
     }
