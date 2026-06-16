@@ -1114,15 +1114,16 @@ function applyTheme(theme) {
   const appliedTheme = setCurrentTheme(theme);
 
   if (refs.themeToggleBtn) {
-    refs.themeToggleBtn.textContent = appliedTheme === 'dark' ? '🌙 Thème sombre' : '☀️ Thème clair';
+    const icon  = refs.themeToggleBtn.querySelector('.theme-icon');
+    const label = refs.themeToggleBtn.querySelector('#themeBtnLabel');
+    if (icon)  icon.textContent  = appliedTheme === 'dark' ? '🌙' : '☀️';
+    if (label) label.textContent = appliedTheme === 'dark' ? 'Thème sombre' : 'Thème clair';
   }
 
   const metaTheme = document.querySelector('meta[name="theme-color"]');
-
   if (metaTheme) {
     metaTheme.setAttribute('content', appliedTheme === 'dark' ? '#07111f' : '#edf4fb');
   }
-}
 
 function bindBasicModalButtons() {
   if (document.body.dataset.basicButtonsBound === 'true') {
