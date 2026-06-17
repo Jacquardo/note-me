@@ -172,22 +172,12 @@ export function getFileKind(fileRecord = {}) {
   const type = String(fileRecord.type || '').toLowerCase();
   const name = String(fileRecord.name || '').toLowerCase();
 
-  if (type.startsWith('image/') || /\.(png|jpe?g)$/.test(name)) {
-    return 'image';
-  }
-
-  if (type === 'application/pdf' || name.endsWith('.pdf')) {
-    return 'pdf';
-  }
-
-  if (
-    type === 'application/msword' ||
-    type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
-    /\.(doc|docx)$/.test(name)
-  ) {
-    return 'document';
-  }
-
+  if (type.startsWith('image/')  || /\.(png|jpe?g|gif|webp)$/.test(name))   return 'image';
+  if (type === 'application/pdf' || name.endsWith('.pdf'))                    return 'pdf';
+  if (type.startsWith('video/')  || /\.(mp4|webm|mov|avi)$/.test(name))     return 'video';
+  if (type.startsWith('audio/')  || /\.(mp3|wav|ogg|aac|m4a)$/.test(name))  return 'audio';
+  if (type.includes('word')      || /\.(doc|docx)$/.test(name))              return 'document';
+  if (type.includes('sheet')     || /\.(xls|xlsx)$/.test(name))             return 'spreadsheet';
   return 'file';
 }
 
