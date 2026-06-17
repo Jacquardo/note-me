@@ -141,27 +141,26 @@ function bindEssentialUi() {
 
 /* ── Ouverture / téléchargement de pièce jointe ─────────── */
 
+/* ── Ouverture / téléchargement de pièce jointe ─────────── */
+
 async function openAttachment(note) {
   if (!note?.fileId) return;
 
   try {
-    const fileRecord = await state.modules.filesRepository.getById(note.fileId);
+    const fileRecord = await getFileFromDB(note.fileId);
     if (!fileRecord?.blob) {
       showToast('Fichier introuvable.', 'error');
       return;
     }
 
-    const url   = URL.createObjectURL(fileRecord.blob);
+    const url  = URL.createObjectURL(fileRecord.blob);
     registerObjectUrl(url);
-    const type  = (note.fileType || '').toLowerCase();
-    const name  = note.fileName  || 'fichier';
+    const type = (note.fileType || fileRecord.type || '').toLowerCase();
+    const name = note.fileName  || fileRecord.name || 'fichier';
 
     if (type.startsWith('image/')) {
-      // Réutilise la modale image existante
       if (refs.imageViewer)    refs.imageViewer.src = url;
-      if (refs.downloadImageBtn) {
-        refs.downloadImageBtn.onclick = () => triggerDownload(url, name);
-      }
+      if (refs.downloadImageBtn) refs.downloadImageBtn.onclick = () => triggerDownload(url, name);
       openModal(refs.imageModal);
 
     } else if (type === 'application/pdf') {
@@ -183,24 +182,26 @@ async function openAttachment(note) {
 }
 
 function openMediaModal(url, fileName, mimeType) {
-  const viewer      = document.getElementById('mediaViewer');
-  const titleEl     = document.getElementById('mediaModalTitle');
-  const downloadBtn = document.getElementById('downloadMediaBtn');
-  const modal       = document.getElementById('mediaModal');
+  const viewer      = refs.mediaViewer;
+  const titleEl     = refs.mediaModalTitle;
+  const downloadBtn = refs.downloadMediaBtn;
+  const modal       = refs.mediaModal;
   if (!viewer || !modal) return;
 
-  // Vide le contenu précédent
   viewer.innerHTML = '';
 
   if (mimeType.startsWith('video/')) {
     const video = document.createElement('video');
     video.src      = url;
     video.controls = true;
+    video.style.maxWidth = '100%';
+    video.style.borderRadius = '12px';
     viewer.appendChild(video);
   } else {
     const audio = document.createElement('audio');
     audio.src      = url;
     audio.controls = true;
+    audio.style.width = '100%';
     viewer.appendChild(audio);
   }
 
@@ -789,6 +790,7 @@ async function renderApp() {
       onDelete: deleteNote,
       onRestore: restoreNote,
       onToggleFavorite: toggleFavorite,
+      onOpenAttachment: (note) => openAttachment(note),
       onLoadMore: loadMoreNotes
     });
 
