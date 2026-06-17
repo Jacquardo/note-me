@@ -1,61 +1,479 @@
-const CACHE_VERSION = 'v11.0.3'; // ← version incrémentée pour vider le cache stale
-const CACHE_NAME = `notes-me-${CACHE_VERSION}`;
+/* css/responsive.css */
 
-const REQUIRED_ASSETS = [
-  './',
-  'index.html',
-  'manifest.webmanifest',
-  'assets/logo.png'
-];
+/* ─────────────────────────────────────────────────────────────
+   Tablettes et mobiles
+───────────────────────────────────────────────────────────── */
 
-const OPTIONAL_ASSETS = [
-  'css/variables.css',
-  'css/base.css',
-  'css/layout.css',
-  'css/components.css',
-  'css/notes.css',
-  'css/modals.css',
-  'css/responsive.css',
-  'js/app.js',
-  'js/state.js',
-  'js/config/constants.js',
-  'js/config/backgrounds.js',
-  'js/db/database.js',
-  'js/db/migrations.js',
-  'js/db/notesRepository.js',
-  'js/db/filesRepository.js',
-  'js/db/versionsRepository.js',
-  'js/db/settingsRepository.js',
-  'js/services/exportZip.js',
-  'js/services/importZip.js',
-  'js/services/search.js',
-  'js/services/storage.js',
-  'js/services/history.js',
-  'js/services/pwa.js',
-  'js/ui/dom.js',
-  'js/ui/toast.js',
-  'js/ui/modals.js',
-  'js/ui/notesRenderer.js',
-  'js/ui/listViews.js',
-  'js/ui/emptyState.js',
-  'js/ui/accessibility.js',
-  'js/ui/settingsPanel.js',
-  'js/utils/debounce.js',
-  'js/utils/dates.js',
-  'js/utils/files.js',
-  'js/utils/colors.js',
-  'js/utils/ids.js',
-  'js/utils/text.js',
-  'vendor/sortable.min.js',
-  'vendor/jszip.min.js',
-  'assets/img1.png',   // ← sans slash, relatif au scope du SW
-  'assets/img2.png',
-  'assets/img3.png',
-  'assets/img4.png',
-  'assets/img5.png',
-  'assets/img6.png',
-  'assets/img7.png',
-  'assets/img8.png',
-  'assets/img9.png',
-  'assets/img10.png'
-];
+@media (max-width: 768px) {
+
+  html, body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .app-shell {
+    width: 100%;
+    max-width: 100%;
+    overflow: visible;
+  }
+
+  /* ── Header mobile ─────────────────────────────────────── */
+
+  .title-container {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 16px;
+  }
+
+  .brand-block {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .brand-block img {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 auto;
+  }
+
+  .brand-text {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .title {
+    font-size: 1.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .subtitle {
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── Header right : compact sur mobile ────────────────── */
+
+  .header-right {
+    flex: 0 0 auto;
+    min-width: unset;
+    width: auto;
+    gap: 5px;                  /* ← réduit */
+  }
+
+  .header-nav-group {
+    padding: 5px 8px;          /* ← réduit */
+    gap: 6px;                  /* ← réduit */
+    border-radius: 14px;
+  }
+
+  /* ── Masquer le texte de sync sur mobile ───────────────── */
+
+  .header-sub-row #syncStatusBlock {
+    display: none;             /* ← masqué sur mobile */
+  }
+
+  .header-sub-row {
+    justify-content: flex-end; /* ← toggle thème à droite seul */
+    padding: 0 2px;
+    gap: 6px;
+  }
+
+  /* ── Menu toggle ───────────────────────────────────────── */
+
+  .menu-toggle-btn {
+    width: 36px;               /* ← réduit */
+    min-width: 36px;
+    height: 36px;
+    min-height: 36px;
+    padding: 0;
+    font-size: 1rem;
+    border-radius: 11px;
+  }
+
+  .top-nav-menu {
+    min-width: 220px;
+  }
+
+  .top-nav-menu.open {
+    display: flex;
+  }
+
+  .nav-menu-btn {
+    width: 100%;
+    min-height: 44px;
+    justify-content: flex-start;
+    white-space: normal;
+  }
+
+  /* ── Toggle thème ──────────────────────────────────────── */
+
+  .theme-pill-btn {
+    min-height: 28px;
+    height: 28px;
+    min-width: 28px;
+    width: 28px;
+    font-size: 13px;
+  }
+
+  /* ── Avatar utilisateur ────────────────────────────────── */
+
+  .user-avatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  .user-display-name {
+    display: none;             /* ← nom masqué sur mobile */
+  }
+
+  /* ── Contenu principal ─────────────────────────────────── */
+
+  .main-content {
+    width: 100%;
+    padding: 0;
+  }
+
+  .topbar {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+    width: 100%;
+    padding: 0.9rem;
+    border-radius: 1.4rem;
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+    width: 100%;
+  }
+
+  .toolbar-search,
+  #searchInput,
+  .toolbar-select,
+  .toolbar-mini,
+  select,
+  input[type="search"] {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #searchInput,
+  .toolbar-select,
+  .toolbar-mini {
+    min-height: 54px;
+    border-radius: 1rem;
+  }
+
+  /* ── Panneau filtre sur mobile ─────────────────────────── */
+
+  .filter-panel {
+    min-width: unset;
+    width: calc(100vw - 48px);
+    max-width: 340px;
+  }
+
+  /* ── Filtres rapides ───────────────────────────────────── */
+
+  .filters-bar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+    width: 100%;
+    padding: 0.9rem;
+    border-radius: 1.4rem;
+  }
+
+  .filter-chip {
+    width: 100%;
+    min-height: 46px;
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* ── Stats : 3 colonnes sur mobile ────────────────────── */
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    padding: 0.7rem 0.5rem;
+    border-radius: 1rem;
+    text-align: center;
+  }
+
+  .stat-label { font-size: 0.78rem; margin-bottom: 4px; }
+  .stat-value { font-size: 1.35rem; line-height: 1; }
+
+  /* ── En-tête de liste ──────────────────────────────────── */
+
+  .list-header {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+    padding: 0.85rem;
+    border-radius: 1.3rem;
+  }
+
+  .section-label,
+  .view-badge { text-align: center; }
+
+  /* ── Notes ─────────────────────────────────────────────── */
+
+  .notes-list {
+    width: 100%;
+    padding: 0.75rem;
+  }
+
+  .item {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .note-head { gap: 0.5rem; }
+
+  .note-title,
+  .note-content { overflow-wrap: anywhere; }
+
+  .note-actions {
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .note-action-btn {
+    flex: 1 1 auto;
+    min-height: 38px;
+  }
+
+  /* ── Charger plus ──────────────────────────────────────── */
+
+  .load-more-wrapper { padding: 0.75rem; }
+
+  #loadMoreBtn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  /* ── Paramètres actions grid ───────────────────────────── */
+
+  .settings-actions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* ── Modales ────────────────────────────────────────────── */
+
+  .modal { padding: 0.75rem; }
+
+  .modal-card {
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100dvh - 1.5rem);
+    overflow-y: auto;
+    border-radius: 1.25rem;
+  }
+
+  .editor-card { width: 100%; }
+
+  .editor-header {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+
+  .editor-header-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .editor-header-actions .btn {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  .editor-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .editor-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .editor-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .editor-actions .btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  textarea { min-height: 160px; }
+
+  .attachment-info {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .attachment-name {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  /* ── Emoji ─────────────────────────────────────────────── */
+
+  .emoji-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.4rem;
+  }
+
+  .emoji-group {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.4rem;
+  }
+
+  .emoji-btn { min-height: 40px; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Petits mobiles (≤ 520px)
+───────────────────────────────────────────────────────────── */
+
+@media (max-width: 520px) {
+
+  .title-container {
+    gap: 8px;
+    padding: 8px 10px;
+  }
+
+  .brand-block img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .title { font-size: 1.05rem; }
+  .subtitle { font-size: 0.72rem; }
+
+  .header-nav-group {
+    padding: 4px 6px;
+    gap: 5px;
+  }
+
+  .menu-toggle-btn {
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    min-height: 32px;
+    font-size: 0.95rem;
+  }
+
+  .user-avatar {
+    width: 26px;
+    height: 26px;
+  }
+
+  .user-display-name { display: none; }
+
+  .theme-pill-btn {
+    min-height: 26px;
+    height: 26px;
+    min-width: 26px;
+    width: 26px;
+    font-size: 12px;
+  }
+
+  .filter-panel {
+    width: calc(100vw - 24px);
+  }
+
+  .stats {
+    gap: 0.4rem;
+  }
+
+  .stat-label { font-size: 0.72rem; }
+  .stat-value { font-size: 1.2rem; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Très petits écrans (≤ 420px)
+───────────────────────────────────────────────────────────── */
+
+@media (max-width: 420px) {
+
+  .title-container,
+  .topbar,
+  .filters-bar,
+  .list-header,
+  .notes-list {
+    padding: 0.7rem;
+  }
+
+  .brand-block img {
+    width: 36px;
+    height: 36px;
+  }
+
+  .title { font-size: 0.95rem; }
+  .subtitle { font-size: 0.7rem; }
+
+  .filters-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-chip { white-space: normal; }
+
+  .editor-header-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .emoji-group {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Correction clavier Android
+───────────────────────────────────────────────────────────── */
+
+@supports (height: 100dvh) {
+  @media (max-width: 768px) {
+    .login-overlay {
+      min-height: 100dvh;
+    }
+    .modal-card {
+      max-height: calc(100dvh - 1.5rem);
+    }
+  }
+}
