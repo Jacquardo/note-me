@@ -114,6 +114,7 @@ function bindEssentialUi() {
   bindAuthLifecycle();
   bindFilterPanel();
 }
+
  function bindFilterPanel() {
   const filterToggleBtn = refs.filterToggleBtn || document.getElementById('filterToggleBtn');
   const filterPanel = document.getElementById('filterPanel');
@@ -138,6 +139,97 @@ function bindEssentialUi() {
   });
 }
 
+/* ── Ouverture / téléchargement de pièce jointe ─────────── */
+
+async function openAttachment(note) {
+  if (!note?.fileId) return;
+
+  try {
+    const fileRecord = await state.modules.filesRepository.getById(note.fileId);
+    if (!fileRecord?.blob) {
+      showToast('Fichier introuvable.', 'error');
+      return;
+    }
+
+    const url   = URL.createObjectURL(fileRecord.blob);
+    registerObjectUrl(url);
+    const type  = (note.fileType || '').toLowerCase();
+    const name  = note.fileName  || 'fichier';
+
+    if (type.startsWith('image/')) {
+      // Réutilise la modale image existante
+      if (refs.imageViewer)    refs.imageViewer.src = url;
+      if (refs.downloadImageBtn) {
+        refs.downloadImageBtn.onclick = () => triggerDownload(url, name);
+      }
+      openModal(refs.imageModal);
+
+    } else if (type === 'application/pdf') {
+      window.open(url, '_blank', 'noopener,noreferrer');
+
+    } else if (type.startsWith('video/') || type.startsWith('audio/')) {
+      openMediaModal(url, name, type);
+
+    } else {
+      // DOC, XLS, ZIP, etc. → téléchargement direct
+      triggerDownload(url, name);
+      setTimeout(() => unregisterObjectUrl(url), 3000);
+    }
+
+  } catch (err) {
+    console.error('Erreur ouverture fichier :', err);
+    showToast("Impossible d'ouvrir le fichier.", 'error');
+  }
+}
+
+function openMediaModal(url, fileName, mimeType) {
+  const viewer      = document.getElementById('mediaViewer');
+  const titleEl     = document.getElementById('mediaModalTitle');
+  const downloadBtn = document.getElementById('downloadMediaBtn');
+  const modal       = document.getElementById('mediaModal');
+  if (!viewer || !modal) return;
+
+  // Vide le contenu précédent
+  viewer.innerHTML = '';
+
+  if (mimeType.startsWith('video/')) {
+    const video = document.createElement('video');
+    video.src      = url;
+    video.controls = true;
+    viewer.appendChild(video);
+  } else {
+    const audio = document.createElement('audio');
+    audio.src      = url;
+    audio.controls = true;
+    viewer.appendChild(audio);
+  }
+
+  if (titleEl)     titleEl.textContent = fileName;
+  if (downloadBtn) downloadBtn.onclick = () => triggerDownload(url, fileName);
+
+  openModal(modal);
+}
+
+function triggerDownload(url, fileName) {
+  const a = document.createElement('a');
+  a.href     = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function getFileIcon(mimeType) {
+  const t = (mimeType || '').toLowerCase();
+  if (t.startsWith('image/'))                  return '🖼️';
+  if (t === 'application/pdf')                 return '📄';
+  if (t.startsWith('video/'))                  return '🎬';
+  if (t.startsWith('audio/'))                  return '🎵';
+  if (t.includes('word') || t.includes('doc')) return '📝';
+  if (t.includes('sheet') || t.includes('xls'))return '📊';
+  if (t.includes('zip') || t.includes('rar'))  return '📦';
+  return '📎';
+}
 // ─────────────────────────────────────────────────────────────
 // Déconnexion Google
 // ─────────────────────────────────────────────────────────────
