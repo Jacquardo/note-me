@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v11.0.4'; // ← version incrémentée pour vider le cache stale
+const CACHE_VERSION = 'v11.0.3'; // ← version incrémentée pour vider le cache stale
 const CACHE_NAME = `notes-me-${CACHE_VERSION}`;
 
 const REQUIRED_ASSETS = [
