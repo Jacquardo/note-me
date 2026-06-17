@@ -50,8 +50,7 @@
   transform: translateY(0) scale(0.98);
 }
 
-/*
-   Boutons (.btn)€ */
+/* ── Boutons (.btn) ─────────────────────────────────────── */
 
 .btn {
   display: inline-flex;
@@ -111,8 +110,8 @@
   text-align: left;
 }
 
-/* 
-   Champs de saisie */
+/* ── Champs de saisie ───────────────────────────────────── */
+
 .toolbar-search input,
 .toolbar-select,
 .editor-modal input[type="text"],
@@ -163,8 +162,7 @@ textarea::placeholder {
   font-weight: 800;
 }
 
-/* 
-   Filtres rapides */
+/* ── Filtres rapides ────────────────────────────────────── */
 
 .filter-chip {
   min-height: 40px;
@@ -184,8 +182,7 @@ textarea::placeholder {
   box-shadow: 0 10px 20px rgba(255, 200, 61, 0.10);
 }
 
-/* 
-   Statistiques€ */
+/* ── Statistiques ───────────────────────────────────────── */
 
 .stat-card {
   min-width: 130px;
@@ -222,8 +219,7 @@ textarea::placeholder {
   letter-spacing: -0.02em;
 }
 
-/*
-   Labels de section et badge de vue */
+/* ── Labels de section et badge de vue ─────────────────── */
 
 .section-label {
   display: inline-flex;
@@ -253,8 +249,7 @@ textarea::placeholder {
   font-weight: 700;
 }
 
-/* 
-   Palette de couleurs */
+/* ── Palette de couleurs ────────────────────────────────── */
 
 .color-picker {
   display: flex;
@@ -303,7 +298,7 @@ textarea::placeholder {
   border: 1px solid rgba(0, 0, 0, 0.14);
 }
 
-/* SÃ©lecteur de fonds de note */
+/* ── Sélecteur de fonds de note ─────────────────────────── */
 
 .background-picker {
   display: grid;
@@ -346,7 +341,6 @@ textarea::placeholder {
   box-shadow: 0 0 0 3px rgba(79, 199, 255, 0.18);
 }
 
-/* Ã‰tat de prÃ©-sÃ©lection en attente de confirmation */
 .background-option.pending {
   outline: 2px dashed var(--accent-a);
   outline-offset: 2px;
@@ -383,21 +377,17 @@ textarea::placeholder {
   font-weight: 700;
 }
 
-/* Nom du fond actif affichÃ© sous le bouton toggle */
 .active-background-name {
   color: var(--text-muted);
   font-size: 13px;
   font-weight: 700;
 }
 
-/* Bouton de confirmation du fond sÃ©lectionnÃ© */
 .apply-background-btn {
   margin-top: 4px;
   width: 100%;
   transition: opacity var(--transition-normal);
 }
-
-/*Miniature de fond (usage gÃ©nÃ©rique) */
 
 .background-thumb {
   width: 44px;
@@ -407,7 +397,7 @@ textarea::placeholder {
   object-fit: cover;
 }
 
-/*Panneau emoji */
+/* ── Panneau emoji ──────────────────────────────────────── */
 
 .emoji-panel {
   margin-bottom: 16px;
@@ -454,7 +444,7 @@ textarea::placeholder {
   font-size: 20px;
 }
 
-/*PiÃ¨ce jointe */
+/* ── Pièce jointe ───────────────────────────────────────── */
 
 .attachment-info {
   display: flex;
@@ -488,9 +478,7 @@ textarea::placeholder {
   box-shadow: none;
 }
 
-/*
-   ParamÃ¨tres
- */
+/* ── Paramètres ─────────────────────────────────────────── */
 
 .settings-check {
   display: flex;
@@ -500,9 +488,7 @@ textarea::placeholder {
   font-weight: 700;
 }
 
-/* 
-   Toasts / Notifications
-*/
+/* ── Toasts / Notifications ─────────────────────────────── */
 
 .toast-region {
   position: fixed;
@@ -556,11 +542,12 @@ textarea::placeholder {
   line-height: 1;
 }
 
-/* ── Bouton Filtrer + panneau déroulant ────────────────── */
+/* ── Bouton Filtrer + panneau déroulant ─────────────────── */
 
 .filter-dropdown-wrapper {
   position: relative;
   flex: 0 0 auto;
+  z-index: var(--menu-z);      /* ← fix superposition */
 }
 
 .filter-toggle-btn {
@@ -621,4 +608,22 @@ textarea::placeholder {
   font-size: 13px;
   min-height: 34px;
   padding: 6px 12px;
+}
+
+/* ── Force la visibilité des chips dans le panneau ──────── */
+
+.filter-panel .filter-chip {
+  display: inline-flex !important;
+  color: var(--text-main) !important;
+  background: var(--ghost-bg) !important;
+  border: 1px solid var(--ghost-border) !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.filter-panel .filter-chip.active,
+.filter-panel .filter-chip[aria-pressed="true"] {
+  background: linear-gradient(135deg, rgba(79, 199, 255, 0.22), rgba(255, 200, 61, 0.18)) !important;
+  border-color: rgba(255, 200, 61, 0.38) !important;
+  color: var(--text-main) !important;
 }
