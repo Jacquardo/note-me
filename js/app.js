@@ -74,30 +74,6 @@ async function init() {
   }
 
   hydrateRefs();
-  function bindFilterPanel() {
-  const filterToggleBtn = refs.filterToggleBtn || document.getElementById('filterToggleBtn');
-  const filterPanel = document.getElementById('filterPanel');
-  if (!filterToggleBtn || !filterPanel) return;
-
-  filterToggleBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = !filterPanel.hidden;
-    filterPanel.hidden = isOpen;
-    filterPanel.setAttribute('aria-hidden', String(isOpen));
-    filterToggleBtn.setAttribute('aria-expanded', String(!isOpen));
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!filterPanel.hidden &&
-        !filterToggleBtn.contains(e.target) &&
-        !filterPanel.contains(e.target)) {
-      filterPanel.hidden = true;
-      filterPanel.setAttribute('aria-hidden', 'true');
-      filterToggleBtn.setAttribute('aria-expanded', 'false');
-    }
-  });
-}
-  
   bindEssentialUi();
 
   try {
@@ -137,6 +113,29 @@ function bindEssentialUi() {
   bindLogout();
   bindAuthLifecycle();
   bindFilterPanel();
+}
+ function bindFilterPanel() {
+  const filterToggleBtn = refs.filterToggleBtn || document.getElementById('filterToggleBtn');
+  const filterPanel = document.getElementById('filterPanel');
+  if (!filterToggleBtn || !filterPanel) return;
+
+  filterToggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = !filterPanel.hidden;
+    filterPanel.hidden = isOpen;
+    filterPanel.setAttribute('aria-hidden', String(isOpen));
+    filterToggleBtn.setAttribute('aria-expanded', String(!isOpen));
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!filterPanel.hidden &&
+        !filterToggleBtn.contains(e.target) &&
+        !filterPanel.contains(e.target)) {
+      filterPanel.hidden = true;
+      filterPanel.setAttribute('aria-hidden', 'true');
+      filterToggleBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
 }
 
 // ─────────────────────────────────────────────────────────────
