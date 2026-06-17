@@ -141,13 +141,18 @@ function bindEssentialUi() {
 
 /* ── Ouverture / téléchargement de pièce jointe ─────────── */
 
-/* ── Ouverture / téléchargement de pièce jointe ─────────── */
 
 async function openAttachment(note) {
   if (!note?.fileId) return;
 
   try {
-    const fileRecord = await getFileFromDB(note.fileId);
+    const filesRepository = state.modules.filesRepository;
+    if (!filesRepository || typeof filesRepository.getFileFromDB !== 'function') {
+      showToast('Service de fichiers indisponible.', 'error');
+      return;
+    }
+
+    const fileRecord = await filesRepository.getFileFromDB(note.fileId);
     if (!fileRecord?.blob) {
       showToast('Fichier introuvable.', 'error');
       return;
@@ -159,7 +164,7 @@ async function openAttachment(note) {
     const name = note.fileName  || fileRecord.name || 'fichier';
 
     if (type.startsWith('image/')) {
-      if (refs.imageViewer)    refs.imageViewer.src = url;
+      if (refs.imageViewer)      refs.imageViewer.src = url;
       if (refs.downloadImageBtn) refs.downloadImageBtn.onclick = () => triggerDownload(url, name);
       openModal(refs.imageModal);
 
@@ -170,7 +175,6 @@ async function openAttachment(note) {
       openMediaModal(url, name, type);
 
     } else {
-      // DOC, XLS, ZIP, etc. → téléchargement direct
       triggerDownload(url, name);
       setTimeout(() => unregisterObjectUrl(url), 3000);
     }
@@ -180,7 +184,6 @@ async function openAttachment(note) {
     showToast("Impossible d'ouvrir le fichier.", 'error');
   }
 }
-
 function openMediaModal(url, fileName, mimeType) {
   const viewer      = refs.mediaViewer;
   const titleEl     = refs.mediaModalTitle;
@@ -2055,6 +2058,20 @@ function closeImageModal() {
   if (refs.imageViewer) {
     refs.imageViewer.removeAttribute('src');
   }
+}
+
+function closeMediaModal() {
+  const viewer = refs.mediaViewer;
+  if (viewer) {
+    const media = viewer.querySelector('video, audio');
+    if (media) {
+      media.pause();
+      media.removeAttribute('src');
+      media.load();
+    }
+    viewer.innerHTML = '';
+  }
+  closeModal(refs.mediaModal);
 }
 
 function editNote(noteId) {
