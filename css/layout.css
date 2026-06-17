@@ -199,20 +199,6 @@
   backdrop-filter: blur(12px);
 }
 
-.filters-bar {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-  padding: 12px 14px;
-  border-radius: var(--radius-lg);
-  background: var(--surface-soft);
-  border: 1px solid var(--ghost-border);
-  box-shadow: var(--shadow-xs);
-  backdrop-filter: blur(12px);
-}
-
 .toolbar-search {
   flex: 1 1 320px;
   min-width: min(100%, 280px);
