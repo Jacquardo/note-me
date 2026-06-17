@@ -160,78 +160,101 @@
     
 
     <main id="mainContent" class="main-content" role="main" tabindex="-1">
-      <section class="topbar" aria-label="Contrôles et filtres">
-        <div class="controls">
-          <div class="toolbar-search">
-            <label class="sr-only" for="searchInput">Rechercher une note</label>
-            <input
-              id="searchInput"
-              type="search"
-              placeholder='Rechercher, exemple : client #urgent category:compta has:pdf'
-              autocomplete="off"
-              spellcheck="true"
-            >
+      <div class="topbar">
+  <div class="controls">
+
+    <!-- Recherche (reste visible en permanence) -->
+    <div class="toolbar-search">
+      <input
+        id="searchInput"
+        type="search"
+        class="toolbar-select"
+        placeholder="🔍 Rechercher une note…"
+        aria-label="Rechercher une note"
+        autocomplete="off"
+      >
+    </div>
+
+    <!-- Bouton Filtrer + panneau déroulant -->
+    <div class="filter-dropdown-wrapper">
+      <button
+        id="filterToggleBtn"
+        class="btn btn-secondary filter-toggle-btn"
+        type="button"
+        aria-expanded="false"
+        aria-controls="filterPanel"
+      >
+        ⚡ Filtrer
+      </button>
+
+      <div id="filterPanel" class="filter-panel" aria-hidden="true" hidden>
+
+        <!-- Affichage -->
+        <div class="filter-panel-section">
+          <span class="filter-panel-label">Affichage</span>
+          <div class="filter-panel-chips">
+            <button id="filterAllBtn"      class="filter-chip" type="button" aria-pressed="false">📝 Toutes les notes</button>
+            <button id="filterFavBtn"      class="filter-chip" type="button" aria-pressed="false">⭐ Favoris</button>
+            <button id="filterWithFileBtn" class="filter-chip" type="button" aria-pressed="false">📎 Avec fichiers</button>
+            <button id="filterRecentBtn"   class="filter-chip" type="button" aria-pressed="false">🕐 Récentes</button>
+            <button id="toggleTrashViewBtn" class="filter-chip" type="button" aria-pressed="false">🗑️ Corbeille</button>
           </div>
+        </div>
 
-          <label class="sr-only" for="categoryFilter">Filtrer par catégorie</label>
-          <select id="categoryFilter" class="toolbar-select toolbar-mini" aria-label="Filtrer par catégorie">
-            <option value="">Toutes catégories</option>
-          </select>
-
-          <label class="sr-only" for="sortSelect">Trier les notes</label>
-          <select id="sortSelect" class="toolbar-select toolbar-mini" aria-label="Trier les notes">
-            <option value="recent">Plus récentes</option>
-            <option value="updated">Dernière modification</option>
-            <option value="oldest">Plus anciennes</option>
-            <option value="title">Titre A à Z</option>
-            <option value="category">Catégorie</option>
-            <option value="custom">Ordre personnalisé</option>
-          </select>
-
-          <label class="sr-only" for="viewModeSelect">Mode d'affichage</label>
-          <select id="viewModeSelect" class="toolbar-select toolbar-mini" aria-label="Mode d'affichage">
-            <option value="cards">Vue cartes</option>
-            <option value="list">Vue liste</option>
-            <option value="compact">Vue compacte</option>
-            <option value="table">Vue tableau</option>
+        <!-- Tri -->
+        <div class="filter-panel-section">
+          <label class="filter-panel-label" for="sortSelect">Tri</label>
+          <select id="sortSelect" class="toolbar-select">
+            <option value="recent">⏰ Plus récentes</option>
+            <option value="updated">✏️ Dernières modifications</option>
+            <option value="oldest">📅 Plus anciennes</option>
+            <option value="title">🔤 Par titre</option>
+            <option value="category">📂 Par catégorie</option>
+            <option value="custom">🔀 Personnalisé</option>
           </select>
         </div>
 
-        <div class="filters-bar" role="group" aria-label="Filtres rapides">
-          <button id="filterAllBtn" class="filter-chip active" type="button" aria-pressed="true">
-            Toutes
-          </button>
-
-          <button id="filterFavBtn" class="filter-chip" type="button" aria-pressed="false">
-            ⭐ Favoris
-          </button>
-
-          <button id="filterWithFileBtn" class="filter-chip" type="button" aria-pressed="false">
-            📎 Avec fichier
-          </button>
-
-          <button id="filterRecentBtn" class="filter-chip" type="button" aria-pressed="false">
-            🕒 Récentes
-          </button>
+        <!-- Catégorie -->
+        <div class="filter-panel-section">
+          <label class="filter-panel-label" for="categoryFilter">Catégorie</label>
+          <select id="categoryFilter" class="toolbar-select">
+            <option value="">Toutes les catégories</option>
+          </select>
         </div>
 
-        <aside class="stats" aria-label="Statistiques des notes">
-          <div class="stat-card">
-            <span class="stat-label">Actives</span>
-            <strong id="activeCount" class="stat-value">0</strong>
-          </div>
+        <!-- Vue -->
+        <div class="filter-panel-section">
+          <label class="filter-panel-label" for="viewModeSelect">Vue</label>
+          <select id="viewModeSelect" class="toolbar-select">
+            <option value="cards">🃏 Cartes</option>
+            <option value="list">📋 Liste</option>
+            <option value="compact">📌 Compact</option>
+            <option value="table">📊 Tableau</option>
+          </select>
+        </div>
 
-          <div class="stat-card">
-            <span class="stat-label">Favoris</span>
-            <strong id="favoriteCount" class="stat-value">0</strong>
-          </div>
+      </div>
+    </div>
 
-          <div class="stat-card">
-            <span class="stat-label">Corbeille</span>
-            <strong id="trashCount" class="stat-value">0</strong>
-          </div>
-        </aside>
-      </section>
+  </div>
+
+  <!-- Stats (inchangées) -->
+  <div class="stats">
+    <button class="stat-card" type="button" aria-label="Voir toutes les notes">
+      <span class="stat-label">Actives</span>
+      <span class="stat-value" id="activeCount">0</span>
+    </button>
+    <button class="stat-card" type="button" aria-label="Voir les favoris">
+      <span class="stat-label">Favoris</span>
+      <span class="stat-value" id="favoriteCount">0</span>
+    </button>
+    <button class="stat-card" type="button" aria-label="Voir la corbeille">
+      <span class="stat-label">Corbeille</span>
+      <span class="stat-value" id="trashCount">0</span>
+    </button>
+  </div>
+</div>
+<!-- Supprimer l'ancienne <div class="filters-bar"> qui suit -->
 
       <section class="list-header" aria-label="Liste des notes">
         <h2 id="listTitle" class="section-label">Mes notes</h2>
