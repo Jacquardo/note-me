@@ -67,7 +67,7 @@
   font-weight: 700;
 }
 
-/* ── Header right : groupe nav + sous-ligne ────────────── */
+/* ── Header right ───────────────────────────────────────── */
 
 .header-right {
   display: flex;
@@ -107,7 +107,7 @@
   text-overflow: ellipsis;
 }
 
-/* ── Nav menu dropdown ─────────────────────────────────── */
+/* ── Nav menu dropdown ──────────────────────────────────── */
 
 .top-nav {
   position: relative;
@@ -137,7 +137,7 @@
   display: flex;
 }
 
-/* ── Bouton toggle thème ───────────────────────────────── */
+/* ── Bouton toggle thème ────────────────────────────────── */
 
 .theme-pill-btn {
   flex: 0 0 auto;
@@ -151,7 +151,7 @@
   line-height: 1;
 }
 
-/* ── Paramètres : section Actions ─────────────────────── */
+/* ── Paramètres : section Actions ───────────────────────── */
 
 .settings-section-title {
   margin: 20px 0 10px;
@@ -171,7 +171,7 @@
   margin-bottom: 8px;
 }
 
-/* ── Contenu principal ─────────────────────────────────── */
+/* ── Contenu principal ──────────────────────────────────── */
 
 .main-content {
   width: 100%;
@@ -186,6 +186,8 @@
 }
 
 .controls {
+  position: relative;          /* ← fix superposition */
+  z-index: 2;                  /* ← fix superposition */
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
