@@ -555,3 +555,70 @@ textarea::placeholder {
   font-size: 20px;
   line-height: 1;
 }
+
+/* ── Bouton Filtrer + panneau déroulant ────────────────── */
+
+.filter-dropdown-wrapper {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.filter-toggle-btn {
+  gap: 8px;
+  min-height: 42px;
+  padding: 10px 18px;
+  border-radius: 14px;
+  font-size: 14px;
+}
+
+.filter-toggle-btn[aria-expanded="true"] {
+  background: linear-gradient(135deg, rgba(79, 199, 255, 0.18), rgba(255, 200, 61, 0.14));
+  border-color: rgba(79, 199, 255, 0.34);
+}
+
+.filter-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: var(--menu-z);
+  min-width: 300px;
+  padding: 16px;
+  border-radius: 18px;
+  background: var(--panel-bg-solid);
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(16px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.filter-panel[hidden] {
+  display: none;
+}
+
+.filter-panel-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-panel-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.filter-panel-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.filter-panel-chips .filter-chip {
+  font-size: 13px;
+  min-height: 34px;
+  padding: 6px 12px;
+}
