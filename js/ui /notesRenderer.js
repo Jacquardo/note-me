@@ -4,20 +4,25 @@ import {
   createElement,
   isInteractiveElement
 } from './dom.js';
+
 import { createEmptyStateElement, getEmptyStateMessage } from './emptyState.js';
 import { applyViewMode, getViewLabel } from './listViews.js';
 
 export async function renderNotes({
   container, notes = [], state = {}, refs = {},
-  onOpen, onEdit, onDelete, onRestore, onToggleFavorite
+  onOpen, onEdit, onDelete, onRestore, onToggleFavorite, onOpenAttachment
 } = {}) {
   if (!container) return;
+
   container.setAttribute('aria-busy', 'true');
   applyViewMode(container, state.viewMode || 'cards');
+
   if (refs.viewBadge) {
     refs.viewBadge.textContent = getViewLabel(state.viewMode || 'cards');
   }
+
   const fragment = document.createDocumentFragment();
+
   if (!notes.length) {
     const emptyMessage = getEmptyStateMessage({
       currentView: state.currentView,
@@ -31,47 +36,66 @@ export async function renderNotes({
     container.setAttribute('aria-busy', 'false');
     return;
   }
+
   const renderLimit = getSafeRenderLimit(state);
   const visibleNotes = notes.slice(0, renderLimit);
+
   for (const note of visibleNotes) {
-    fragment.appendChild(createNoteCard({ note, state, onOpen, onEdit, onDelete, onRestore, onToggleFavorite }));
+    fragment.appendChild(createNoteCard({
+      note, state, onOpen, onEdit, onDelete, onRestore, onToggleFavorite, onOpenAttachment
+    }));
   }
+
   container.replaceChildren(fragment);
+
   if (refs.loadMoreBtn) {
     refs.loadMoreBtn.hidden = notes.length <= visibleNotes.length;
     refs.loadMoreBtn.onclick = () => {
-      renderMoreNotes({ container, notes, state, refs, onOpen, onEdit, onDelete, onRestore, onToggleFavorite });
+      renderMoreNotes({
+        container, notes, state, refs,
+        onOpen, onEdit, onDelete, onRestore, onToggleFavorite, onOpenAttachment
+      });
     };
   }
+
   state.renderedOffset = visibleNotes.length;
   state.hasMoreNotes = notes.length > visibleNotes.length;
   container.setAttribute('aria-busy', 'false');
+
   await yieldToBrowser();
 }
 
 export function renderMoreNotes({
   container, notes = [], state = {}, refs = {},
-  onOpen, onEdit, onDelete, onRestore, onToggleFavorite
+  onOpen, onEdit, onDelete, onRestore, onToggleFavorite, onOpenAttachment
 } = {}) {
   if (!container) return;
+
   const currentOffset = Number(state.renderedOffset || 0);
   const renderLimit = getSafeRenderLimit(state);
   const nextNotes = notes.slice(currentOffset, currentOffset + renderLimit);
   const fragment = document.createDocumentFragment();
+
   for (const note of nextNotes) {
-    fragment.appendChild(createNoteCard({ note, state, onOpen, onEdit, onDelete, onRestore, onToggleFavorite }));
+    fragment.appendChild(createNoteCard({
+      note, state, onOpen, onEdit, onDelete, onRestore, onToggleFavorite, onOpenAttachment
+    }));
   }
+
   container.appendChild(fragment);
+
   const nextOffset = currentOffset + nextNotes.length;
   state.renderedOffset = nextOffset;
   state.hasMoreNotes = notes.length > nextOffset;
+
   if (refs.loadMoreBtn) refs.loadMoreBtn.hidden = !state.hasMoreNotes;
 }
 
 export function createNoteCard({
-  note, state = {}, onOpen, onEdit, onDelete, onRestore, onToggleFavorite
+  note, state = {}, onOpen, onEdit, onDelete, onRestore, onToggleFavorite, onOpenAttachment
 } = {}) {
   const noteId = note?.id || '';
+
   const item = createElement('article', {
     className: `item ${note.deletedAt ? 'is-deleted' : ''}`.trim(),
     attrs: {
@@ -81,36 +105,48 @@ export function createNoteCard({
     },
     dataset: { noteId }
   });
+
   applyNoteStyle(item, note);
-  const head = createNoteHead(note, onToggleFavorite);
-  const badges = createNoteBadges(note);
-  const content = createNoteContent(note);
-  const attachmentZone = createAttachmentZone(note);
-  const meta = createNoteMeta(note);
-  const actions = createNoteActions(note, { onEdit, onDelete, onRestore });
+
+  const head          = createNoteHead(note, onToggleFavorite);
+  const badges        = createNoteBadges(note);
+  const content       = createNoteContent(note);
+  const attachmentZone = createAttachmentZone(note, onOpenAttachment);
+  const meta          = createNoteMeta(note);
+  const actions       = createNoteActions(note, { onEdit, onDelete, onRestore });
+
   item.appendChild(head);
   item.appendChild(badges);
   item.appendChild(content);
   if (attachmentZone) item.appendChild(attachmentZone);
   item.appendChild(meta);
   item.appendChild(actions);
+
   item.addEventListener('click', (event) => {
     if (isInteractiveElement(event.target)) return;
     if (typeof onOpen === 'function') onOpen(noteId);
   });
+
   item.addEventListener('keydown', (event) => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
     if (isInteractiveElement(event.target)) return;
     event.preventDefault();
     if (typeof onOpen === 'function') onOpen(noteId);
   });
+
   return item;
 }
 
 function createNoteHead(note, onToggleFavorite) {
   const head = createElement('div', { className: 'note-head' });
-  const title = createElement('h3', { className: 'note-title', textContent: note.title || 'Sans titre' });
+
+  const title = createElement('h3', {
+    className: 'note-title',
+    textContent: note.title || 'Sans titre'
+  });
+
   const actions = createElement('div', { className: 'head-actions' });
+
   const favoriteButton = createButton({
     className: `head-icon-btn ${note.favorite ? 'is-favorite' : ''}`.trim(),
     textContent: note.favorite ? '★' : '☆',
@@ -123,38 +159,73 @@ function createNoteHead(note, onToggleFavorite) {
       });
     }
   });
+
   favoriteButton.setAttribute('aria-pressed', note.favorite ? 'true' : 'false');
+
   actions.appendChild(favoriteButton);
   head.appendChild(title);
   head.appendChild(actions);
+
   return head;
 }
 
 function createNoteBadges(note) {
   const badges = createElement('div', { className: 'note-badges' });
+
   if (note.favorite) badges.appendChild(createBadge('⭐ Favori'));
   if (note.category) badges.appendChild(createBadge(note.category));
+
   for (const tag of note.tags || []) {
-    badges.appendChild(createBadge(`#${tag}`));  // ← parenthèses correctes
+    badges.appendChild(createBadge(`#${tag}`));
   }
+
   if (note.fileId || note.fileName) badges.appendChild(createBadge(getFileBadgeText(note)));
   if (note.deletedAt) badges.appendChild(createBadge('🗑️ Corbeille'));
+
   return badges;
 }
 
 function createNoteContent(note) {
-  return createElement('p', { className: 'note-content', textContent: note.content || '' });
+  return createElement('p', {
+    className: 'note-content',
+    textContent: note.content || ''
+  });
 }
 
-function createAttachmentZone(note) {
+/* ── Pièce jointe cliquable ─────────────────────────────── */
+
+function createAttachmentZone(note, onOpenAttachment) {
   if (!note.fileId && !note.fileName) return null;
+
   const zone = createElement('div', { className: 'note-attachment-zone' });
-  const chip = createElement('span', {
-    className: 'attachment-chip',
-    textContent: getFileBadgeText(note),
-    attrs: { title: note.fileName || 'Pièce jointe' }
+
+  const chip = createButton({
+    className: 'attachment-chip-btn',
+    attrs: { title: note.fileName || 'Pièce jointe', 'aria-label': `Ouvrir : ${note.fileName || 'Pièce jointe'}` },
+    onClick: (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      runCallbackSafely(() => {
+        if (typeof onOpenAttachment === 'function') onOpenAttachment(note);
+      });
+    }
   });
+
+  const icon = createElement('span', {
+    className: 'attach-icon',
+    textContent: getFileIcon(note),
+    attrs: { 'aria-hidden': 'true' }
+  });
+
+  const label = createElement('span', {
+    className: 'attach-label',
+    textContent: note.fileName || 'Pièce jointe'
+  });
+
+  chip.appendChild(icon);
+  chip.appendChild(label);
   zone.appendChild(chip);
+
   return zone;
 }
 
@@ -167,6 +238,7 @@ function createNoteMeta(note) {
 
 function createNoteActions(note, callbacks = {}) {
   const actions = createElement('div', { className: 'note-actions' });
+
   if (note.deletedAt) {
     const restoreButton = createButton({
       className: 'note-action-btn',
@@ -183,6 +255,7 @@ function createNoteActions(note, callbacks = {}) {
     actions.appendChild(restoreButton);
     return actions;
   }
+
   const editButton = createButton({
     className: 'note-action-btn',
     textContent: '✏️',
@@ -195,6 +268,7 @@ function createNoteActions(note, callbacks = {}) {
       });
     }
   });
+
   const deleteButton = createButton({
     className: 'note-action-btn danger',
     textContent: '🗑️',
@@ -207,20 +281,27 @@ function createNoteActions(note, callbacks = {}) {
       });
     }
   });
+
   actions.appendChild(editButton);
   actions.appendChild(deleteButton);
+
   return actions;
 }
+
+/* ── Styles de la carte ─────────────────────────────────── */
 
 function applyNoteStyle(item, note) {
   const color = isValidHexColor(note.color) ? note.color : '#fff8a6';
   item.style.setProperty('--note-bg-light', color);
   item.style.setProperty('--note-bg-base', color);
   applyNoteBackgroundToElement(item, note);
+
   const rotation = getStableRotation(note.id);
   item.style.setProperty('--rot', `${rotation}deg`);
+
   const textColor = getReadableTextColor(color);
   item.style.setProperty('--note-text', textColor);
+
   if (textColor === '#ffffff') {
     item.style.setProperty('--note-chip-bg', 'rgba(0, 0, 0, 0.34)');
   } else {
@@ -238,12 +319,11 @@ function applyNoteBackgroundToElement(item, note) {
   }
 
   const safeValue = cssEscapeUrl(backgroundValue);
-
   let imageValue;
+
   if (safeValue.startsWith('linear-gradient') || safeValue.startsWith('radial-gradient')) {
     imageValue = safeValue;
   } else {
-    // URL absolue pour éviter la résolution relative à css/notes.css
     const anchor = document.createElement('a');
     anchor.href = safeValue;
     imageValue = `url("${anchor.href}")`;
@@ -251,6 +331,25 @@ function applyNoteBackgroundToElement(item, note) {
 
   item.style.setProperty('--note-image-url', imageValue);
   item.classList.add('has-background-image');
+}
+
+/* ── Utilitaires ────────────────────────────────────────── */
+
+function getFileBadgeText(note) {
+  return `${getFileIcon(note)} ${note.fileName || 'Fichier'}`;
+}
+
+function getFileIcon(note) {
+  const type = String(note.fileType || '').toLowerCase();
+  const name = String(note.fileName || '').toLowerCase();
+
+  if (type.startsWith('image/')  || /\.(png|jpe?g|gif|webp)$/.test(name)) return '🖼️';
+  if (type === 'application/pdf' || name.endsWith('.pdf'))                  return '📕';
+  if (type.startsWith('video/')  || /\.(mp4|webm|mov|avi)$/.test(name))   return '🎬';
+  if (type.startsWith('audio/')  || /\.(mp3|wav|ogg|aac|m4a)$/.test(name)) return '🎵';
+  if (/\.(doc|docx)$/.test(name) || type.includes('word'))                  return '📄';
+  if (/\.(xls|xlsx)$/.test(name) || type.includes('sheet'))                 return '📊';
+  return '📎';
 }
 
 function runCallbackSafely(callback) {
@@ -262,24 +361,13 @@ function getSafeRenderLimit(state) {
   return Math.min(Math.max(base, 20), 300);
 }
 
-function getFileBadgeText(note) {
-  return `${getFileIcon(note)} ${note.fileName || 'Fichier'}`;
-}
-
-function getFileIcon(note) {
-  const type = String(note.fileType || '').toLowerCase();
-  const name = String(note.fileName || '').toLowerCase();
-  if (type.startsWith('image/') || /\.(png|jpe?g|gif|webp)$/.test(name)) return '🖼️';
-  if (type.includes('pdf') || name.endsWith('.pdf')) return '📕';
-  if (/\.(doc|docx)$/.test(name)) return '📄';
-  return '📎';
-}
-
 function formatDate(timestamp) {
   if (!timestamp) return 'Date inconnue';
   try {
-    return new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(timestamp));
-  } catch (error) {
+    return new Intl.DateTimeFormat('fr-FR', {
+      dateStyle: 'medium', timeStyle: 'short'
+    }).format(new Date(timestamp));
+  } catch {
     return new Date(timestamp).toLocaleString('fr-FR');
   }
 }
