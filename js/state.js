@@ -89,7 +89,7 @@ export const refs = {};
 
 export function hydrateRefs() {
   const ids = [
-    'filterToggleBtn', 'app', 'mainContent', 'menuToggleBtn', 'topNavMenu', 'openBtn',
+    'mediaModal', 'closeMediaModalBtn', 'mediaViewer', 'downloadMediaBtn', 'mediaModalTitle', 'filterToggleBtn', 'app', 'mainContent', 'menuToggleBtn', 'topNavMenu', 'openBtn',
     'exportZipBtn', 'importZipBtn', 'importZipInput', 'installAppBtn',
     'toggleTrashViewBtn', 'emptyTrashBtn', 'settingsBtn', 'themeToggleBtn',
     'helpBtn', 'searchInput', 'categoryFilter', 'sortSelect', 'viewModeSelect',
