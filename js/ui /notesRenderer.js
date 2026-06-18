@@ -179,7 +179,14 @@ function createNoteBadges(note) {
     badges.appendChild(createBadge(`#${tag}`));
   }
 
-  if (note.fileId || note.fileName) badges.appendChild(createBadge(getFileBadgeText(note)));
+  // Afficher le badge du premier fichier (ou le nombre total)
+  const files = getNoteFiles(note);
+  if (files.length === 1) {
+    badges.appendChild(createBadge(getFileBadgeText({ fileType: files[0].fileType, fileName: files[0].fileName })));
+  } else if (files.length > 1) {
+    badges.appendChild(createBadge(`📎 ${files.length} fichiers`));
+  }
+
   if (note.deletedAt) badges.appendChild(createBadge('🗑️ Corbeille'));
 
   return badges;
@@ -228,7 +235,61 @@ function createAttachmentZone(note, onOpenAttachment) {
 
   return zone;
 }
+function createAttachmentZone(note, onOpenAttachment) {
+  // Migration : ancienne note avec fileId mais sans files[]
+  const files = getNoteFiles(note);
+  if (!files.length) return null;
 
+  const zone = createElement('div', { className: 'note-attachment-zone' });
+
+  for (const f of files) {
+    const chip = createButton({
+      className: 'attachment-chip-btn',
+      attrs: {
+        title:       f.fileName || 'Pièce jointe',
+        'aria-label': `Ouvrir : ${f.fileName || 'Pièce jointe'}`
+      },
+      onClick: (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        runCallbackSafely(() => {
+          if (typeof onOpenAttachment === 'function') onOpenAttachment(f);
+        });
+      }
+    });
+
+    const icon  = createElement('span', {
+      className:   'attach-icon',
+      textContent: getFileIcon({ fileType: f.fileType, fileName: f.fileName }),
+      attrs: { 'aria-hidden': 'true' }
+    });
+
+    const label = createElement('span', {
+      className:   'attach-label',
+      textContent: f.fileName || 'Pièce jointe'
+    });
+
+    chip.appendChild(icon);
+    chip.appendChild(label);
+    zone.appendChild(chip);
+  }
+
+  return zone;
+}
+
+// Utilitaire migration single → multi
+function getNoteFiles(note) {
+  if (note.files?.length) return note.files;
+  if (note.fileId) {
+    return [{
+      fileId:   note.fileId,
+      fileName: note.fileName,
+      fileType: note.fileType,
+      fileSize: note.fileSize
+    }];
+  }
+  return [];
+}
 function createNoteMeta(note) {
   return createElement('span', {
     className: 'note-meta',
