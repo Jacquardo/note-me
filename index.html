@@ -378,11 +378,39 @@
           <input id="tagsInput" type="text" placeholder="urgent, client, facture" autocomplete="off">
 
           <div class="editor-row">
-            <div class="field-group">
-              <label class="editor-label" for="colorPaletteInput">Couleur</label>
-              <input id="colorPaletteInput" type="color" value="#fff8a6">
-              <input id="colorInput" type="hidden" value="#fff8a6">
-            </div>
+<!-- ── Pièces jointes (multi-fichiers) ──────────────────── -->
+<div class="field-group">
+  <label class="editor-label">
+    📎 Fichiers joints
+    (<span id="filesCountLabel">0</span> / 7)
+  </label>
+
+  <!-- Liste dynamique des fichiers attachés -->
+  <div id="filesContainer" class="files-container" aria-live="polite"></div>
+
+  <!-- Bouton d'ajout -->
+  <button
+    id="attachBtn"
+    class="btn btn-secondary"
+    type="button"
+    aria-label="Ajouter un fichier (max 7, 25 Mo chacun)"
+  >
+    📎 Ajouter un fichier
+  </button>
+
+  <!-- Input fichier (déclenché par attachBtn) -->
+  <input
+    id="fileInput"
+    type="file"
+    hidden
+    accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.webp,.mp3,.wav,.ogg,.aac,.m4a,.mp4,.webm,.mov"
+  >
+
+  <!-- Éléments legacy masqués (conservés pour compatibilité JS) -->
+  <div id="attachmentInfo" hidden aria-hidden="true"></div>
+  <span id="attachmentName" hidden aria-hidden="true"></span>
+  <button id="removeFileBtn" type="button" hidden aria-hidden="true"></button>
+</div>
 
             <div class="field-group">
               <span class="editor-label">Couleur active</span>
