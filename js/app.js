@@ -24,6 +24,7 @@ import {
 } from './state.js';
 // ── Authentification Google ───────────────────────────────
 import { initAuth, signOut } from './auth.js';
+import { getFileFromDB } from './db/filesRepository.js';
 import { migrateBackgroundImagePaths } from './db/migrations.js';
 // Ligne 27, après l'import de migrations.js, ajouter :
 import {
@@ -143,18 +144,36 @@ function bindEssentialUi() {
 
 
 async function openAttachment(note) {
-  if (!note?.fileId) return;
+  if (!note?.fileId) {
+    showToast('Aucun fichier lié à cette note.', 'warning');
+    return;
+  }
 
   try {
-    const filesRepository = state.modules.filesRepository;
-    if (!filesRepository || typeof filesRepository.getFileFromDB !== 'function') {
+    // Cherche getFileFromDB de plusieurs façons
+    let getFileFn = null;
+
+    if (typeof getFileFromDB === 'function') {
+      // Importé directement en haut du fichier
+      getFileFn = getFileFromDB;
+    } else if (typeof state.modules?.filesRepository?.getFileFromDB === 'function') {
+      // Via state.modules
+      getFileFn = state.modules.filesRepository.getFileFromDB.bind(state.modules.filesRepository);
+    } else {
       showToast('Service de fichiers indisponible.', 'error');
+      console.error('[openAttachment] getFileFromDB introuvable dans state.modules:', state.modules);
       return;
     }
 
-    const fileRecord = await filesRepository.getFileFromDB(note.fileId);
-    if (!fileRecord?.blob) {
-      showToast('Fichier introuvable.', 'error');
+    const fileRecord = await getFileFn(note.fileId);
+
+    if (!fileRecord) {
+      showToast('Fichier introuvable en base de données.', 'error');
+      return;
+    }
+
+    if (!fileRecord.blob) {
+      showToast('Le fichier ne contient pas de données.', 'error');
       return;
     }
 
@@ -180,10 +199,11 @@ async function openAttachment(note) {
     }
 
   } catch (err) {
-    console.error('Erreur ouverture fichier :', err);
-    showToast("Impossible d'ouvrir le fichier.", 'error');
+    console.error('[openAttachment] Erreur :', err, '| note.fileId:', note.fileId, '| modules:', state.modules);
+    showToast(`Erreur : ${err?.message || 'inconnue'}`, 'error');
   }
 }
+
 function openMediaModal(url, fileName, mimeType) {
   const viewer      = refs.mediaViewer;
   const titleEl     = refs.mediaModalTitle;
