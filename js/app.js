@@ -2007,9 +2007,44 @@ function openNote(noteId) {
     badges.appendChild(createBadge(`#${tag}`));
   }
 
-  if (note.fileName) {
-    badges.appendChild(createBadge(`📎 ${note.fileName}`));
-  }
+  // ✅ Chip cliquable qui ouvre/télécharge le fichier
+if (note.fileName || note.fileId) {
+  const attachChip = document.createElement('button');
+  attachChip.type      = 'button';
+  attachChip.className = 'attachment-chip-btn';
+  attachChip.setAttribute('title', note.fileName || 'Pièce jointe');
+  attachChip.setAttribute('aria-label', `Ouvrir : ${note.fileName || 'Pièce jointe'}`);
+
+  // Icône selon le type de fichier
+  const noteType = (note.fileType || '').toLowerCase();
+  const noteName = (note.fileName || '').toLowerCase();
+  let icon = '📎';
+  if      (noteType.startsWith('image/')  || /\.(png|jpe?g|gif|webp)$/.test(noteName))  icon = '🖼️';
+  else if (noteType === 'application/pdf' || noteName.endsWith('.pdf'))                   icon = '📕';
+  else if (noteType.startsWith('video/')  || /\.(mp4|webm|mov|avi)$/.test(noteName))    icon = '🎬';
+  else if (noteType.startsWith('audio/')  || /\.(mp3|wav|ogg|aac|m4a)$/.test(noteName)) icon = '🎵';
+  else if (/\.(doc|docx)$/.test(noteName))                                               icon = '📄';
+  else if (/\.(xls|xlsx)$/.test(noteName))                                               icon = '📊';
+
+  const iconSpan  = document.createElement('span');
+  iconSpan.setAttribute('aria-hidden', 'true');
+  iconSpan.textContent = icon;
+
+  const labelSpan = document.createElement('span');
+  labelSpan.className  = 'attach-label';
+  labelSpan.textContent = note.fileName || 'Pièce jointe';
+
+  attachChip.appendChild(iconSpan);
+  attachChip.appendChild(labelSpan);
+
+  attachChip.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    openAttachment(note);
+  });
+
+  badges.appendChild(attachChip);
+}
 
   const content = document.createElement('p');
   content.textContent = note.content || '';
