@@ -1920,12 +1920,6 @@ async function saveCurrentNote() {
       await snapshotNote(existingNote, 'before-update');
     }
 
-    let fileId = draft.fileId;
-    let fileName = draft.fileName;
-    let fileType = draft.fileType;
-    let fileSize = draft.fileSize;
-    }
-
 // ── Multi-fichiers : sauvegarder tous les fichiers ───────
 const savedFiles = await saveAllFiles(draft.files || []);
 const firstFile  = savedFiles[0] || { fileId: '', fileName: '', fileType: '', fileSize: 0 };
