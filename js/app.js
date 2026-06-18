@@ -18,6 +18,7 @@ import {
   setSettings,
   setState,
   state,
+  registerObjectUrl, 
   unregisterObjectUrl,
   updatePagination,
   upsertNoteInState
