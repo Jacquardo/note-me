@@ -315,21 +315,8 @@
         <h2 id="editorModalTitle" class="modal-title">Nouvelle note</h2>
 
         <div class="editor-header-actions">
-          <button id="emojiToggleBtn" class="btn btn-secondary" type="button" aria-expanded="false" aria-controls="emojiPanel">
-            😊 Emoji
-          </button>
-
-          <button id="attachBtn" class="btn btn-secondary" type="button">
-            📎 Joindre
-          </button>
-
-          <input
-            id="fileInput"
-            type="file"
-            accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/png,image/jpeg"
-            hidden
-          >
-        </div>
+  <button id="emojiToggleBtn" ...>😊 Emoji</button>
+</div>
       </div>
 
       <div id="emojiPanel" class="emoji-panel hidden" aria-label="Sélecteur d'emojis">
@@ -477,14 +464,13 @@
 
           <label class="editor-label" for="contentInput">Contenu</label>
           <textarea id="contentInput" placeholder="Notez ici..." rows="8"></textarea>
-
-        </div>
+         </div>
 
         <aside class="editor-side" aria-label="Aperçu de la note">
           <p class="preview-title">Aperçu</p>
           <div id="notePreview" aria-hidden="true"></div>
         </aside>
-      </div>
+   
 
       <div class="editor-actions">
         <button id="cancelEditBtn" class="btn btn-secondary" type="button">
