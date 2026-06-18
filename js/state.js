@@ -66,18 +66,20 @@ export const state = {
   selectedFileRecord: null,
   activeObjectUrls: new Set(),
   editorDraft: {
-    title: '',
-    category: '',
-    tags: '',
-    color: DEFAULT_SETTINGS.defaultNoteColor,
-    backgroundImage: '',
-    favorite: false,
-    content: '',
-    fileId: '',
-    fileName: '',
-    fileType: '',
-    fileSize: 0
-  },
+  title:           '',
+  category:        '',
+  tags:            '',
+  color:           DEFAULT_SETTINGS.defaultNoteColor,
+  backgroundImage: '',
+  favorite:        false,
+  content:         '',
+  files:           [],    // ← tableau multi-fichiers
+  // Héritage (backward compat)
+  fileId:    '',
+  fileName:  '',
+  fileType:  '',
+  fileSize:  0
+},
   pagination: {
     pageSize: DEFAULT_SETTINGS.pageSize,
     offset: 0
@@ -138,21 +140,22 @@ export function setSettings(partialSettings = {}) {
 }
 
 export function resetEditorDraft() {
-  state.editingNoteId = null;
-  state.selectedFile = null;
+  state.editingNoteId      = null;
+  state.selectedFile       = null;
   state.selectedFileRecord = null;
   state.editorDraft = {
-    title: '',
-    category: '',
-    tags: '',
-    color: state.settings.defaultNoteColor || DEFAULT_SETTINGS.defaultNoteColor,
+    title:           '',
+    category:        '',
+    tags:            '',
+    color:           state.settings.defaultNoteColor || DEFAULT_SETTINGS.defaultNoteColor,
     backgroundImage: '',
-    favorite: false,
-    content: '',
-    fileId: '',
-    fileName: '',
-    fileType: '',
-    fileSize: 0
+    favorite:        false,
+    content:         '',
+    files:           [],
+    fileId:          '',
+    fileName:        '',
+    fileType:        '',
+    fileSize:        0
   };
   return state.editorDraft;
 }
