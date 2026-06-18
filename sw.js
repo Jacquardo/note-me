@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v11.0.6';   // ← incrémenté (responsive.css, components.css, layout.css mis à jour)
+const CACHE_VERSION = 'v11.0.5';   // ← incrémenté (responsive.css, components.css, layout.css mis à jour)
 
 const CACHE_NAME = `notes-me-${CACHE_VERSION}`;
 
