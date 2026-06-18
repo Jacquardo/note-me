@@ -25,9 +25,9 @@ export async function renderNotes({
 
   if (!notes.length) {
     const emptyMessage = getEmptyStateMessage({
-      currentView: state.currentView,
-      activeFilter: state.activeFilter,
-      searchQuery: state.searchQuery,
+      currentView:    state.currentView,
+      activeFilter:   state.activeFilter,
+      searchQuery:    state.searchQuery,
       categoryFilter: state.categoryFilter
     });
     fragment.appendChild(createEmptyStateElement(emptyMessage.title, emptyMessage.message));
@@ -37,7 +37,7 @@ export async function renderNotes({
     return;
   }
 
-  const renderLimit = getSafeRenderLimit(state);
+  const renderLimit  = getSafeRenderLimit(state);
   const visibleNotes = notes.slice(0, renderLimit);
 
   for (const note of visibleNotes) {
@@ -59,7 +59,7 @@ export async function renderNotes({
   }
 
   state.renderedOffset = visibleNotes.length;
-  state.hasMoreNotes = notes.length > visibleNotes.length;
+  state.hasMoreNotes   = notes.length > visibleNotes.length;
   container.setAttribute('aria-busy', 'false');
 
   await yieldToBrowser();
@@ -72,9 +72,9 @@ export function renderMoreNotes({
   if (!container) return;
 
   const currentOffset = Number(state.renderedOffset || 0);
-  const renderLimit = getSafeRenderLimit(state);
-  const nextNotes = notes.slice(currentOffset, currentOffset + renderLimit);
-  const fragment = document.createDocumentFragment();
+  const renderLimit   = getSafeRenderLimit(state);
+  const nextNotes     = notes.slice(currentOffset, currentOffset + renderLimit);
+  const fragment      = document.createDocumentFragment();
 
   for (const note of nextNotes) {
     fragment.appendChild(createNoteCard({
@@ -84,9 +84,9 @@ export function renderMoreNotes({
 
   container.appendChild(fragment);
 
-  const nextOffset = currentOffset + nextNotes.length;
+  const nextOffset     = currentOffset + nextNotes.length;
   state.renderedOffset = nextOffset;
-  state.hasMoreNotes = notes.length > nextOffset;
+  state.hasMoreNotes   = notes.length > nextOffset;
 
   if (refs.loadMoreBtn) refs.loadMoreBtn.hidden = !state.hasMoreNotes;
 }
@@ -99,8 +99,8 @@ export function createNoteCard({
   const item = createElement('article', {
     className: `item ${note.deletedAt ? 'is-deleted' : ''}`.trim(),
     attrs: {
-      tabindex: '0',
-      role: 'button',
+      tabindex:    '0',
+      role:        'button',
       'aria-label': `Ouvrir la note ${note.title || 'sans titre'}`
     },
     dataset: { noteId }
@@ -108,12 +108,12 @@ export function createNoteCard({
 
   applyNoteStyle(item, note);
 
-  const head          = createNoteHead(note, onToggleFavorite);
-  const badges        = createNoteBadges(note);
-  const content       = createNoteContent(note);
+  const head           = createNoteHead(note, onToggleFavorite);
+  const badges         = createNoteBadges(note);
+  const content        = createNoteContent(note);
   const attachmentZone = createAttachmentZone(note, onOpenAttachment);
-  const meta          = createNoteMeta(note);
-  const actions       = createNoteActions(note, { onEdit, onDelete, onRestore });
+  const meta           = createNoteMeta(note);
+  const actions        = createNoteActions(note, { onEdit, onDelete, onRestore });
 
   item.appendChild(head);
   item.appendChild(badges);
@@ -138,19 +138,14 @@ export function createNoteCard({
 }
 
 function createNoteHead(note, onToggleFavorite) {
-  const head = createElement('div', { className: 'note-head' });
-
-  const title = createElement('h3', {
-    className: 'note-title',
-    textContent: note.title || 'Sans titre'
-  });
-
+  const head    = createElement('div', { className: 'note-head' });
+  const title   = createElement('h3', { className: 'note-title', textContent: note.title || 'Sans titre' });
   const actions = createElement('div', { className: 'head-actions' });
 
   const favoriteButton = createButton({
     className: `head-icon-btn ${note.favorite ? 'is-favorite' : ''}`.trim(),
     textContent: note.favorite ? '★' : '☆',
-    ariaLabel: note.favorite ? 'Retirer des favoris' : 'Ajouter aux favoris',
+    ariaLabel:   note.favorite ? 'Retirer des favoris' : 'Ajouter aux favoris',
     onClick: (event) => {
       event.preventDefault();
       event.stopPropagation();
@@ -161,11 +156,9 @@ function createNoteHead(note, onToggleFavorite) {
   });
 
   favoriteButton.setAttribute('aria-pressed', note.favorite ? 'true' : 'false');
-
   actions.appendChild(favoriteButton);
   head.appendChild(title);
   head.appendChild(actions);
-
   return head;
 }
 
@@ -176,15 +169,17 @@ function createNoteBadges(note) {
   if (note.category) badges.appendChild(createBadge(note.category));
 
   for (const tag of note.tags || []) {
-    badges.appendChild(createBadge(`#${tag}`));
+    badges.appendChild(createBadge(`#${tag}`));                    // ✅ correction 1
   }
 
-  // Afficher le badge du premier fichier (ou le nombre total)
   const files = getNoteFiles(note);
   if (files.length === 1) {
-    badges.appendChild(createBadge(getFileBadgeText({ fileType: files[0].fileType, fileName: files[0].fileName })));
+    badges.appendChild(createBadge(getFileBadgeText({
+      fileType: files[0].fileType,
+      fileName: files[0].fileName
+    })));
   } else if (files.length > 1) {
-    badges.appendChild(createBadge(`📎 ${files.length} fichiers`));
+    badges.appendChild(createBadge(`📎 ${files.length} fichiers`)); // ✅ correction 2
   }
 
   if (note.deletedAt) badges.appendChild(createBadge('🗑️ Corbeille'));
@@ -193,50 +188,12 @@ function createNoteBadges(note) {
 }
 
 function createNoteContent(note) {
-  return createElement('p', {
-    className: 'note-content',
-    textContent: note.content || ''
-  });
+  return createElement('p', { className: 'note-content', textContent: note.content || '' });
 }
 
-/* ── Pièce jointe cliquable ─────────────────────────────── */
+/* ── Pièce jointe cliquable (multi-fichiers) ────────────── */
 
-function createAttachmentZone(note, onOpenAttachment) {
-  if (!note.fileId && !note.fileName) return null;
-
-  const zone = createElement('div', { className: 'note-attachment-zone' });
-
-  const chip = createButton({
-    className: 'attachment-chip-btn',
-    attrs: { title: note.fileName || 'Pièce jointe', 'aria-label': `Ouvrir : ${note.fileName || 'Pièce jointe'}` },
-    onClick: (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      runCallbackSafely(() => {
-        if (typeof onOpenAttachment === 'function') onOpenAttachment(note);
-      });
-    }
-  });
-
-  const icon = createElement('span', {
-    className: 'attach-icon',
-    textContent: getFileIcon(note),
-    attrs: { 'aria-hidden': 'true' }
-  });
-
-  const label = createElement('span', {
-    className: 'attach-label',
-    textContent: note.fileName || 'Pièce jointe'
-  });
-
-  chip.appendChild(icon);
-  chip.appendChild(label);
-  zone.appendChild(chip);
-
-  return zone;
-}
-function createAttachmentZone(note, onOpenAttachment) {
-  // Migration : ancienne note avec fileId mais sans files[]
+function createAttachmentZone(note, onOpenAttachment) {         // ✅ une seule définition
   const files = getNoteFiles(note);
   if (!files.length) return null;
 
@@ -246,7 +203,7 @@ function createAttachmentZone(note, onOpenAttachment) {
     const chip = createButton({
       className: 'attachment-chip-btn',
       attrs: {
-        title:       f.fileName || 'Pièce jointe',
+        title:        f.fileName || 'Pièce jointe',
         'aria-label': `Ouvrir : ${f.fileName || 'Pièce jointe'}`
       },
       onClick: (event) => {
@@ -258,7 +215,7 @@ function createAttachmentZone(note, onOpenAttachment) {
       }
     });
 
-    const icon  = createElement('span', {
+    const icon = createElement('span', {
       className:   'attach-icon',
       textContent: getFileIcon({ fileType: f.fileType, fileName: f.fileName }),
       attrs: { 'aria-hidden': 'true' }
@@ -277,7 +234,8 @@ function createAttachmentZone(note, onOpenAttachment) {
   return zone;
 }
 
-// Utilitaire migration single → multi
+/* ── Migration single → multi ───────────────────────────── */
+
 function getNoteFiles(note) {
   if (note.files?.length) return note.files;
   if (note.fileId) {
@@ -290,9 +248,10 @@ function getNoteFiles(note) {
   }
   return [];
 }
+
 function createNoteMeta(note) {
   return createElement('span', {
-    className: 'note-meta',
+    className:   'note-meta',
     textContent: formatDate(note.updatedAt || note.createdAt)
   });
 }
@@ -302,9 +261,9 @@ function createNoteActions(note, callbacks = {}) {
 
   if (note.deletedAt) {
     const restoreButton = createButton({
-      className: 'note-action-btn',
+      className:   'note-action-btn',
       textContent: '↩',
-      ariaLabel: 'Restaurer la note',
+      ariaLabel:   'Restaurer la note',
       onClick: (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -318,9 +277,9 @@ function createNoteActions(note, callbacks = {}) {
   }
 
   const editButton = createButton({
-    className: 'note-action-btn',
+    className:   'note-action-btn',
     textContent: '✏️',
-    ariaLabel: 'Modifier la note',
+    ariaLabel:   'Modifier la note',
     onClick: (event) => {
       event.preventDefault();
       event.stopPropagation();
@@ -331,9 +290,9 @@ function createNoteActions(note, callbacks = {}) {
   });
 
   const deleteButton = createButton({
-    className: 'note-action-btn danger',
+    className:   'note-action-btn danger',
     textContent: '🗑️',
-    ariaLabel: 'Supprimer la note',
+    ariaLabel:   'Supprimer la note',
     onClick: (event) => {
       event.preventDefault();
       event.stopPropagation();
@@ -345,7 +304,6 @@ function createNoteActions(note, callbacks = {}) {
 
   actions.appendChild(editButton);
   actions.appendChild(deleteButton);
-
   return actions;
 }
 
@@ -354,7 +312,7 @@ function createNoteActions(note, callbacks = {}) {
 function applyNoteStyle(item, note) {
   const color = isValidHexColor(note.color) ? note.color : '#fff8a6';
   item.style.setProperty('--note-bg-light', color);
-  item.style.setProperty('--note-bg-base', color);
+  item.style.setProperty('--note-bg-base',  color);
   applyNoteBackgroundToElement(item, note);
 
   const rotation = getStableRotation(note.id);
@@ -386,8 +344,8 @@ function applyNoteBackgroundToElement(item, note) {
     imageValue = safeValue;
   } else {
     const anchor = document.createElement('a');
-    anchor.href = safeValue;
-    imageValue = `url("${anchor.href}")`;
+    anchor.href  = safeValue;
+    imageValue   = `url("${anchor.href}")`;
   }
 
   item.style.setProperty('--note-image-url', imageValue);
@@ -404,9 +362,9 @@ function getFileIcon(note) {
   const type = String(note.fileType || '').toLowerCase();
   const name = String(note.fileName || '').toLowerCase();
 
-  if (type.startsWith('image/')  || /\.(png|jpe?g|gif|webp)$/.test(name)) return '🖼️';
-  if (type === 'application/pdf' || name.endsWith('.pdf'))                  return '📕';
-  if (type.startsWith('video/')  || /\.(mp4|webm|mov|avi)$/.test(name))   return '🎬';
+  if (type.startsWith('image/')  || /\.(png|jpe?g|gif|webp)$/.test(name))  return '🖼️';
+  if (type === 'application/pdf' || name.endsWith('.pdf'))                   return '📕';
+  if (type.startsWith('video/')  || /\.(mp4|webm|mov|avi)$/.test(name))    return '🎬';
   if (type.startsWith('audio/')  || /\.(mp3|wav|ogg|aac|m4a)$/.test(name)) return '🎵';
   if (/\.(doc|docx)$/.test(name) || type.includes('word'))                  return '📄';
   if (/\.(xls|xlsx)$/.test(name) || type.includes('sheet'))                 return '📊';
@@ -444,9 +402,9 @@ function isValidHexColor(color) {
 
 function getReadableTextColor(hexColor) {
   const hex = String(hexColor || '#fff8a6').replace('#', '');
-  const r = parseInt(hex.slice(0, 2), 16);
-  const g = parseInt(hex.slice(2, 4), 16);
-  const b = parseInt(hex.slice(4, 6), 16);
+  const r   = parseInt(hex.slice(0, 2), 16);
+  const g   = parseInt(hex.slice(2, 4), 16);
+  const b   = parseInt(hex.slice(4, 6), 16);
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
   return luminance > 0.55 ? '#111827' : '#ffffff';
 }
