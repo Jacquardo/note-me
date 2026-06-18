@@ -1919,7 +1919,7 @@ async function saveCurrentNote() {
     if (existingNote) {
       await snapshotNote(existingNote, 'before-update');
     }
-
+    
 // ── Multi-fichiers : sauvegarder tous les fichiers ───────
 const savedFiles = await saveAllFiles(draft.files || []);
 const firstFile  = savedFiles[0] || { fileId: '', fileName: '', fileType: '', fileSize: 0 };
