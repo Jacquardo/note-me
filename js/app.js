@@ -1266,6 +1266,7 @@ function bindBasicModalButtons() {
   refs.closeHelpModalBtn?.addEventListener('click', closeHelp);
   refs.closeNoteModalBtn?.addEventListener('click', closeNoteModal);
   refs.closeImageModalBtn?.addEventListener('click', closeImageModal);
+  refs.closeMediaModalBtn?.addEventListener('click', closeMediaModal);
 }
 
 function bindModals() {
