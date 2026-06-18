@@ -1681,23 +1681,32 @@ function openEditor(note = null) {
 
   state.editingNoteId = note ? note.id : null;
 
-  if (note) {
-    setEditorDraft({
-      title: note.title || '',
-      category: note.category || '',
-      tags: Array.isArray(note.tags) ? note.tags.join(', ') : '',
-      color: note.color || DEFAULT_SETTINGS.defaultNoteColor,
-      backgroundImage: note.backgroundImage || '',
-      favorite: Boolean(note.favorite),
-      content: note.content || '',
-      fileId: note.fileId || '',
-      fileName: note.fileName || '',
-      fileType: note.fileType || '',
-      fileSize: note.fileSize || 0
-    });
-  }
+if (note) {
+  // Migration single → multi
+  const noteFiles = note.files?.length
+    ? note.files.map(f => ({ ...f, blob: null, isNew: false }))
+    : note.fileId
+      ? [{ fileId: note.fileId, fileName: note.fileName, fileType: note.fileType, fileSize: note.fileSize, blob: null, isNew: false }]
+      : [];
 
-  syncEditorFormFromDraft();
+  setEditorDraft({
+    title:           note.title || '',
+    category:        note.category || '',
+    tags:            Array.isArray(note.tags) ? note.tags.join(', ') : '',
+    color:           note.color || DEFAULT_SETTINGS.defaultNoteColor,
+    backgroundImage: note.backgroundImage || '',
+    favorite:        Boolean(note.favorite),
+    content:         note.content || '',
+    files:           noteFiles,       // ← multi-fichiers
+    fileId:          note.fileId   || '',
+    fileName:        note.fileName || '',
+    fileType:        note.fileType || '',
+    fileSize:        note.fileSize || 0
+  });
+}
+
+syncEditorFormFromDraft();
+renderEditorFiles();                  // ← afficher les fichiers dans l'éditeur
 
   if (refs.editorModalTitle) {
     refs.editorModalTitle.textContent = note ? 'Modifier la note' : 'Nouvelle note';
@@ -1915,35 +1924,30 @@ async function saveCurrentNote() {
     let fileName = draft.fileName;
     let fileType = draft.fileType;
     let fileSize = draft.fileSize;
-
-    if (state.selectedFile) {
-      const savedFile = await saveSelectedFile(state.selectedFile);
-
-      if (savedFile) {
-        fileId = savedFile.id;
-        fileName = savedFile.name;
-        fileType = savedFile.type;
-        fileSize = savedFile.size;
-      }
     }
 
+// ── Multi-fichiers : sauvegarder tous les fichiers ───────
+const savedFiles = await saveAllFiles(draft.files || []);
+const firstFile  = savedFiles[0] || { fileId: '', fileName: '', fileType: '', fileSize: 0 };
+
 const note = {
-  id: existingNote?.id || generateId(),
-  title: draft.title.trim(),
-  category: draft.category.trim(),
-  tags: parseTags(draft.tags),
-  color: draft.color || DEFAULT_SETTINGS.defaultNoteColor,
+  id:              existingNote?.id || generateId(),
+  title:           draft.title.trim(),
+  category:        draft.category.trim(),
+  tags:            parseTags(draft.tags),
+  color:           draft.color || DEFAULT_SETTINGS.defaultNoteColor,
   backgroundImage: draft.backgroundImage || '',
-  favorite: Boolean(draft.favorite),
-  content: draft.content.trim(),
-  fileId: fileId || '',
-  fileName: fileName || '',
-  fileType: fileType || '',
-  fileSize: Number(fileSize || 0),
-  createdAt: existingNote?.createdAt || now,
-  updatedAt: now,
-  deletedAt: existingNote?.deletedAt || null,
-  order: existingNote?.order || now
+  favorite:        Boolean(draft.favorite),
+  content:         draft.content.trim(),
+  files:           savedFiles,           // ← tableau multi-fichiers
+  fileId:          firstFile.fileId   || '',   // backward compat
+  fileName:        firstFile.fileName || '',
+  fileType:        firstFile.fileType || '',
+  fileSize:        Number(firstFile.fileSize || 0),
+  createdAt:       existingNote?.createdAt || now,
+  updatedAt:       now,
+  deletedAt:       existingNote?.deletedAt || null,
+  order:           existingNote?.order || now
 };
 
     const notesRepository = state.modules.notesRepository;
@@ -2030,16 +2034,22 @@ function openNote(noteId) {
   }
 
   // ✅ Chip cliquable qui ouvre/télécharge le fichier
-if (note.fileName || note.fileId) {
+// ── Multi-fichiers dans la modale vue ───────────────────
+const noteFiles = note.files?.length
+  ? note.files
+  : note.fileId
+    ? [{ fileId: note.fileId, fileName: note.fileName, fileType: note.fileType }]
+    : [];
+
+for (const f of noteFiles) {
   const attachChip = document.createElement('button');
   attachChip.type      = 'button';
   attachChip.className = 'attachment-chip-btn';
-  attachChip.setAttribute('title', note.fileName || 'Pièce jointe');
-  attachChip.setAttribute('aria-label', `Ouvrir : ${note.fileName || 'Pièce jointe'}`);
+  attachChip.setAttribute('title',      f.fileName || 'Pièce jointe');
+  attachChip.setAttribute('aria-label', `Ouvrir : ${f.fileName || 'Pièce jointe'}`);
 
-  // Icône selon le type de fichier
-  const noteType = (note.fileType || '').toLowerCase();
-  const noteName = (note.fileName || '').toLowerCase();
+  const noteType = (f.fileType || '').toLowerCase();
+  const noteName = (f.fileName || '').toLowerCase();
   let icon = '📎';
   if      (noteType.startsWith('image/')  || /\.(png|jpe?g|gif|webp)$/.test(noteName))  icon = '🖼️';
   else if (noteType === 'application/pdf' || noteName.endsWith('.pdf'))                   icon = '📕';
@@ -2053,8 +2063,8 @@ if (note.fileName || note.fileId) {
   iconSpan.textContent = icon;
 
   const labelSpan = document.createElement('span');
-  labelSpan.className  = 'attach-label';
-  labelSpan.textContent = note.fileName || 'Pièce jointe';
+  labelSpan.className   = 'attach-label';
+  labelSpan.textContent = f.fileName || 'Pièce jointe';
 
   attachChip.appendChild(iconSpan);
   attachChip.appendChild(labelSpan);
@@ -2062,7 +2072,7 @@ if (note.fileName || note.fileId) {
   attachChip.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
-    openAttachment(note);
+    openAttachment(f);               // ← passe le fichier individuel
   });
 
   badges.appendChild(attachChip);
