@@ -2826,3 +2826,165 @@ function localStorageSafeSet(key, value) {
     console.warn(`Impossible d’écrire ${key} dans localStorage.`, error);
   }
 }
+
+
+function bindAttachment() {
+  refs.attachBtn?.addEventListener('click', () => {
+    if ((state.editorDraft.files?.length || 0) >= 7) {
+      showToast('Maximum 7 fichiers par note.', 'warning');
+      return;
+    }
+    refs.fileInput?.click();
+  });
+
+  refs.fileInput?.addEventListener('change', async (event) => {
+    const file = event.target.files?.[0];
+    if (!refs.fileInput) return;
+    refs.fileInput.value = '';          // reset pour re-sélection
+    if (!file) return;
+
+    const filesRepository = state.modules.filesRepository;
+    if (!filesRepository) return;
+
+    const validation = filesRepository.validateUserFile(file);
+    if (!validation.valid) {
+      showToast(validation.message, 'error');
+      return;
+    }
+
+    if ((state.editorDraft.files?.length || 0) >= 7) {
+      showToast('Maximum 7 fichiers par note.', 'warning');
+      return;
+    }
+
+    const fileId = crypto.randomUUID?.() || `file-${Date.now()}`;
+
+    const fileEntry = {
+      fileId,
+      fileName: file.name,
+      fileType: file.type || '',
+      fileSize: file.size || 0,
+      blob:     file,
+      isNew:    true
+    };
+
+    if (!state.editorDraft.files) state.editorDraft.files = [];
+    state.editorDraft.files.push(fileEntry);
+
+    renderEditorFiles();
+    showToast(`📎 ${file.name} ajouté.`, 'success');
+  });
+}
+
+function renderEditorFiles() {
+  const container = refs.filesContainer || document.getElementById('filesContainer');
+  const countLabel = document.getElementById('filesCountLabel');
+  if (!container) return;
+
+  const files = state.editorDraft.files || [];
+  container.innerHTML = '';
+
+  if (countLabel) countLabel.textContent = files.length;
+
+  for (let i = 0; i < files.length; i++) {
+    const f = files[i];
+    const item = document.createElement('div');
+    item.className = 'file-item';
+
+    const iconEl = document.createElement('span');
+    iconEl.className = 'file-item-icon';
+    iconEl.textContent = getFileIconFromMime(f.fileType, f.fileName);
+    iconEl.setAttribute('aria-hidden', 'true');
+
+    const info = document.createElement('div');
+    info.className = 'file-item-info';
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'file-item-name';
+    nameEl.textContent = f.fileName || 'Fichier';
+
+    const sizeEl = document.createElement('span');
+    sizeEl.className = 'file-item-size';
+    sizeEl.textContent = formatFileSize(f.fileSize);
+
+    info.appendChild(nameEl);
+    info.appendChild(sizeEl);
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'file-item-remove';
+    removeBtn.textContent = '✕';
+    removeBtn.setAttribute('aria-label', `Retirer ${f.fileName}`);
+    removeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      removeFileFromEditor(i);
+    });
+
+    item.appendChild(iconEl);
+    item.appendChild(info);
+    item.appendChild(removeBtn);
+    container.appendChild(item);
+  }
+
+  // Masquer le bouton si max atteint
+  if (refs.attachBtn) {
+    refs.attachBtn.disabled = files.length >= 7;
+    refs.attachBtn.title    = files.length >= 7 ? 'Maximum 7 fichiers atteint' : 'Ajouter un fichier';
+  }
+}
+
+function removeFileFromEditor(index) {
+  if (!state.editorDraft.files) return;
+  state.editorDraft.files.splice(index, 1);
+  renderEditorFiles();
+}
+
+function getFileIconFromMime(type = '', name = '') {
+  const t = type.toLowerCase();
+  const n = name.toLowerCase();
+  if (t.startsWith('image/')  || /\.(png|jpe?g|gif|webp)$/.test(n))    return '🖼️';
+  if (t === 'application/pdf' || n.endsWith('.pdf'))                     return '📕';
+  if (t.startsWith('video/')  || /\.(mp4|webm|mov|avi)$/.test(n))      return '🎬';
+  if (t.startsWith('audio/')  || /\.(mp3|wav|ogg|aac|m4a)$/.test(n))   return '🎵';
+  if (/\.(doc|docx)$/.test(n) || t.includes('word'))                    return '📄';
+  if (/\.(xls|xlsx)$/.test(n) || t.includes('sheet'))                   return '📊';
+  return '📎';
+}
+
+function formatFileSize(bytes = 0) {
+  if (bytes < 1024)             return `${bytes} o`;
+  if (bytes < 1024 * 1024)     return `${Math.round(bytes / 1024)} Ko`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} Mo`;
+}
+
+async function saveAllFiles(files = []) {
+  const filesRepository = state.modules.filesRepository;
+  if (!filesRepository) return [];
+
+  const savedFiles = [];
+
+  for (const f of files) {
+    if (f.isNew && f.blob) {
+      // Nouveau fichier : sauvegarder en DB
+      const fileRecord = {
+        id:       f.fileId,
+        noteId:   '',          // sera mis à jour après sauvegarde note
+        name:     f.fileName,
+        type:     f.fileType,
+        size:     f.fileSize,
+        blob:     f.blob,
+        createdAt: Date.now()
+      };
+      await filesRepository.saveFileToDB(fileRecord);
+    }
+    savedFiles.push({
+      fileId:   f.fileId,
+      fileName: f.fileName,
+      fileType: f.fileType,
+      fileSize: f.fileSize
+    });
+  }
+
+  return savedFiles;
+}
+
