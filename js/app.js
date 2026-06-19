@@ -844,7 +844,7 @@ function filterAndSortNotes() {
   }
 
   if (state.activeFilter === FILTERS.WITH_FILE) {
-    notes = notes.filter((note) => note.fileId);
+    notes = notes.filter((note) => note.fileId || note.files?.length > 0);
   }
 
   if (state.activeFilter === FILTERS.RECENT) {
@@ -1312,12 +1312,9 @@ function bindEditor() {
   }
 
   document.body.dataset.editorBound = 'true';
-
+   bindAttachment();
   refs.saveNoteBtn?.addEventListener('click', saveCurrentNote);
-  refs.attachBtn?.addEventListener('click', () => refs.fileInput?.click());
-  refs.fileInput?.addEventListener('change', handleFileSelection);
-  refs.removeFileBtn?.addEventListener('click', removeSelectedFile);
-
+ 
   refs.titleInput?.addEventListener('input', syncEditorDraftFromForm);
   refs.categoryInput?.addEventListener('input', syncEditorDraftFromForm);
   refs.tagsInput?.addEventListener('input', syncEditorDraftFromForm);
