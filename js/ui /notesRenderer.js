@@ -169,7 +169,7 @@ function createNoteBadges(note) {
   if (note.category) badges.appendChild(createBadge(note.category));
 
   for (const tag of note.tags || []) {
-    badges.appendChild(createBadge(`#${tag}`));                    // ✅ correction 1
+    badges.appendChild(createBadge(`#${tag}`));               
   }
 
   const files = getNoteFiles(note);
@@ -179,7 +179,7 @@ function createNoteBadges(note) {
       fileName: files[0].fileName
     })));
   } else if (files.length > 1) {
-    badges.appendChild(createBadge(`📎 ${files.length} fichiers`)); // ✅ correction 2
+    badges.appendChild(createBadge(`📎 ${files.length} fichiers`));
   }
 
   if (note.deletedAt) badges.appendChild(createBadge('🗑️ Corbeille'));
