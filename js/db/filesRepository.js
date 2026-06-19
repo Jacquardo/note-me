@@ -96,7 +96,7 @@ export function validateUserFile(file) {
   if (!ALLOWED_EXTENSIONS.includes(extension)) {
     return {
       valid: false,
-      message: 'Extension non autorisée. Formats acceptés : PDF, DOC, DOCX, PNG, JPG.'
+      message: 'Extension non autorisée. Formats acceptés : PDF, DOC, DOCX, XLS, XLSX, PNG, JPG, GIF, WEBP, MP3, WAV, OGG, AAC, M4A, MP4, WEBM, MOV.'
     };
   }
 
