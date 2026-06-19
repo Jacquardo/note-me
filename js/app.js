@@ -771,6 +771,7 @@ function getNotesSignature(notes = []) {
         fileType: note.fileType || '',
         fileSize: Number(note.fileSize || 0),
         createdAt: Number(note.createdAt || 0),
+        files:     Array.isArray(note.files) ? note.files.map(f => f.fileId).join(',') : '',
         updatedAt: Number(note.updatedAt || 0),
         deletedAt: note.deletedAt || null,
         order: Number(note.order || 0)
