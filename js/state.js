@@ -91,7 +91,7 @@ export const refs = {};
 
 export function hydrateRefs() {
   const ids = [
-    'mediaModal', 'closeMediaModalBtn', 'mediaViewer', 'downloadMediaBtn', 'mediaModalTitle', 'filterToggleBtn', 'app', 'mainContent', 'menuToggleBtn', 'topNavMenu', 'openBtn',
+    'filesContainer', 'filesCountLabel', 'mediaModal', 'closeMediaModalBtn', 'mediaViewer', 'downloadMediaBtn', 'mediaModalTitle', 'filterToggleBtn', 'app', 'mainContent', 'menuToggleBtn', 'topNavMenu', 'openBtn',
     'exportZipBtn', 'importZipBtn', 'importZipInput', 'installAppBtn',
     'toggleTrashViewBtn', 'emptyTrashBtn', 'settingsBtn', 'themeToggleBtn',
     'helpBtn', 'searchInput', 'categoryFilter', 'sortSelect', 'viewModeSelect',
@@ -196,7 +196,7 @@ export function getFavoriteNotes() {
 }
 
 export function getNotesWithFile() {
-  return state.notes.filter((note) => !note.deletedAt && note.fileId);
+  return state.notes.filter((note) => !note.deletedAt && (note.fileId || note.files?.length > 0));
 }
 
 export function getNoteById(noteId) {
