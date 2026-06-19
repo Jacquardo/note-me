@@ -270,6 +270,7 @@ export const NOTE_DEFAULTS = {
   fileName:        '',
   fileType:        '',
   fileSize:        0,
+  files:           [],
   deletedAt:       null
 };
 
